@@ -3,3 +3,10 @@ dist/
 .env
 .env.*
 .vite/
+__pycache__/
+*.pyc
+db.sqlite3
+venv/
+env/
+media/
+.vscode/
