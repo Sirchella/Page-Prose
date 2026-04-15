@@ -1,0 +1,1 @@
+web: python manage.py migrate --no-input && python manage.py collectstatic --no-input && gunicorn page_and_prose.wsgi --bind 0.0.0.0:$PORT
