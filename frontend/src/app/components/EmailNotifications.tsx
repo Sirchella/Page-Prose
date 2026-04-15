@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { sendTestEmail } from '../api';
 import {
   Mail,
   Eye,
@@ -108,6 +109,9 @@ export function EmailNotifications() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
   const [testEmailSent, setTestEmailSent] = useState(false);
+  const [testEmailAddress, setTestEmailAddress] = useState('');
+  const [testEmailError, setTestEmailError] = useState<string | null>(null);
+  const [testEmailLoading, setTestEmailLoading] = useState(false);
   const [copiedVariable, setCopiedVariable] = useState<string | null>(null);
 
   const handleToggleTemplate = (id: string) => {
@@ -142,9 +146,22 @@ export function EmailNotifications() {
     setEditingTemplate(null);
   };
 
-  const handleSendTestEmail = () => {
-    setTestEmailSent(true);
-    setTimeout(() => setTestEmailSent(false), 3000);
+  const handleSendTestEmail = async () => {
+    if (!testEmailAddress.trim()) {
+      setTestEmailError('Enter an email address to send the test to.');
+      return;
+    }
+    setTestEmailLoading(true);
+    setTestEmailError(null);
+    try {
+      await sendTestEmail(testEmailAddress.trim());
+      setTestEmailSent(true);
+      setTimeout(() => setTestEmailSent(false), 4000);
+    } catch (err: unknown) {
+      setTestEmailError(err instanceof Error ? err.message : 'Failed to send test email.');
+    } finally {
+      setTestEmailLoading(false);
+    }
   };
 
   const handleCopyVariable = (variable: string) => {
@@ -410,30 +427,47 @@ export function EmailNotifications() {
 
               {/* Test Email */}
               <div className="border-t border-[#262626] pt-4">
-                <div className="flex items-center justify-between p-4 bg-blue-950 rounded-lg border border-blue-700">
-                  <div className="flex-1">
+                <div className="p-4 bg-blue-950 rounded-lg border border-blue-700 space-y-3">
+                  <div>
                     <p className="font-semibold text-blue-300 text-sm">Send Test Email</p>
                     <p className="text-xs text-blue-400 mt-1">
-                      Preview this template in your inbox with sample data
+                      Send a real test email to verify your Resend integration
                     </p>
                   </div>
-                  <Button
-                    onClick={handleSendTestEmail}
-                    className="gap-2 bg-[#A68A64] hover:bg-[#8B7355]"
-                    disabled={testEmailSent}
-                  >
-                    {testEmailSent ? (
-                      <>
-                        <CheckCircle className="w-4 h-4" />
-                        Sent!
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-4 h-4" />
-                        Send Test
-                      </>
-                    )}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Input
+                      type="email"
+                      placeholder="your@email.com"
+                      value={testEmailAddress}
+                      onChange={e => { setTestEmailAddress(e.target.value); setTestEmailError(null); }}
+                      className="flex-1 bg-[#0a0a0a] border-[#262626] text-[#f5f5f5] placeholder:text-[#a3a3a3]"
+                    />
+                    <Button
+                      onClick={handleSendTestEmail}
+                      className="gap-2 bg-[#A68A64] hover:bg-[#8B7355] shrink-0"
+                      disabled={testEmailSent || testEmailLoading}
+                    >
+                      {testEmailSent ? (
+                        <>
+                          <CheckCircle className="w-4 h-4" />
+                          Sent!
+                        </>
+                      ) : testEmailLoading ? (
+                        <>
+                          <Send className="w-4 h-4 animate-pulse" />
+                          Sending...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4" />
+                          Send Test
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  {testEmailError && (
+                    <p className="text-xs text-red-400">{testEmailError}</p>
+                  )}
                 </div>
               </div>
             </div>

@@ -158,3 +158,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 CAMPAY_BASE_URL = os.environ.get('CAMPAY_BASE_URL', 'https://demo.campay.net/api/')
 CAMPAY_APP_USERNAME = os.environ.get('CAMPAY_APP_USERNAME', '')
 CAMPAY_APP_PASSWORD = os.environ.get('CAMPAY_APP_PASSWORD', '')
+
+# Resend — transactional email
+# Sign up at https://resend.com, add a verified domain, then set RESEND_API_KEY in Railway env vars
+RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
+FROM_EMAIL = os.environ.get('FROM_EMAIL', 'Page & Prose <orders@pageandprose.com>')

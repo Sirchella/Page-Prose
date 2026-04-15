@@ -4,8 +4,10 @@ from django.conf import settings
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from .models import Order
 from .serializers import OrderSerializer
+from .emails import send_test_email
 
 
 class OrderViewSet(viewsets.ModelViewSet):
@@ -83,3 +85,20 @@ class PaymentStatusView(APIView):
             return Response(res.json())
         except requests.RequestException as e:
             return Response({'error': str(e)}, status=status.HTTP_502_BAD_GATEWAY)
+
+
+class SendTestEmailView(APIView):
+    """POST /api/send-test-email/  — sends a test email (admin only)."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        to = request.data.get('to', '').strip()
+        if not to:
+            return Response({'error': 'to is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        if not settings.RESEND_API_KEY:
+            return Response(
+                {'error': 'RESEND_API_KEY is not configured. Add it to your Railway environment variables.'},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+        send_test_email(to)
+        return Response({'ok': True})

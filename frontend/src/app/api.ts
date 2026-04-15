@@ -187,3 +187,19 @@ export async function checkPaymentStatus(reference: string): Promise<{ status: s
   }
   return res.json();
 }
+
+// ─── Email ───────────────────────────────────────────────────────────────────
+
+/** Sends a test email via Resend to verify the integration. Requires admin auth. */
+export async function sendTestEmail(to: string): Promise<void> {
+  const headers = await authHeaders();
+  const res = handleResponse(await fetch(`${BASE_URL}/send-test-email/`, {
+    method: 'POST',
+    headers: { ...headers, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ to }),
+  }));
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || 'Failed to send test email');
+  }
+}
