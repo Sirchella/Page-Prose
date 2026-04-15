@@ -237,7 +237,13 @@ export function PaymentsOverview() {
               </div>
             </div>
 
-            <Button variant="outline" onClick={() => alert('Exporting report...')} className="gap-2 border-[#262626] text-[#f5f5f5] hover:bg-[#262626]">
+            <Button variant="outline" onClick={() => {
+              const rows = [['ID','Customer','Email','Amount','Method','Status','Date'],
+                ...transactions.map(t => [t.id, t.customer, t.customerEmail, t.amount, t.paymentMethod, t.status, t.date])];
+              const csv = rows.map(r => r.join(',')).join('\n');
+              const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+              a.download = `payments-report-${new Date().toISOString().split('T')[0]}.csv`; a.click();
+            }} className="gap-2 border-[#262626] text-[#f5f5f5] hover:bg-[#262626]">
               <Download className="w-4 h-4" />
               Export Report
             </Button>

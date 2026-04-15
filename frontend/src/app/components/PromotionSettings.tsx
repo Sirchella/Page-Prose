@@ -1,4 +1,4 @@
-import { Plus, Trash2, Copy, Check } from 'lucide-react';
+import { Plus, Trash2, Copy, Check, CheckCircle } from 'lucide-react';
 import { useState } from 'react';
 
 interface Promotion {
@@ -13,6 +13,9 @@ interface Promotion {
 }
 
 export function PromotionSettings() {
+  const [saved, setSaved] = useState(false);
+  const handleSave = () => { setSaved(true); setTimeout(() => setSaved(false), 2500); };
+  const [formError, setFormError] = useState('');
   const [promotions, setPromotions] = useState<Promotion[]>([
     {
       id: '1',
@@ -58,9 +61,10 @@ export function PromotionSettings() {
 
   const addPromotion = () => {
     if (!newPromo.code || !newPromo.value || !newPromo.maxUses || !newPromo.expiryDate) {
-      alert('Please fill in all required fields');
+      setFormError('Please fill in all required fields');
       return;
     }
+    setFormError('');
 
     setPromotions([
       ...promotions,
@@ -223,6 +227,7 @@ export function PromotionSettings() {
                 Create Code
               </button>
             </div>
+            {formError && <p className="text-red-400 text-sm mt-2">{formError}</p>}
           </div>
         </div>
       )}
@@ -314,8 +319,8 @@ export function PromotionSettings() {
 
       {/* Save Button */}
       <div className="flex justify-end pt-4">
-        <button onClick={() => alert('Promotion settings saved!')} className="px-6 py-3 bg-[#A68A64] text-[#0a0a0a] rounded-lg hover:bg-[#C4A67A] transition-colors">
-          Save Promotion Settings
+        <button onClick={handleSave} className="flex items-center gap-2 px-6 py-3 bg-[#A68A64] text-[#0a0a0a] rounded-lg hover:bg-[#C4A67A] transition-colors">
+          {saved ? <><CheckCircle className="w-4 h-4" /> Saved!</> : 'Save Promotion Settings'}
         </button>
       </div>
     </div>

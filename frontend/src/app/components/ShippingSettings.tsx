@@ -1,4 +1,4 @@
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, CheckCircle } from 'lucide-react';
 import { useState } from 'react';
 
 interface ShippingZone {
@@ -15,6 +15,8 @@ interface Carrier {
 }
 
 export function ShippingSettings() {
+  const [saved, setSaved] = useState(false);
+  const handleSave = () => { setSaved(true); setTimeout(() => setSaved(false), 2500); };
   const [zones, setZones] = useState<ShippingZone[]>([
     { id: '1', name: 'Domestic', regions: 'United States', rate: '5.99' },
     { id: '2', name: 'Canada', regions: 'Canada', rate: '12.99' },
@@ -154,8 +156,8 @@ export function ShippingSettings() {
 
       {/* Save Button */}
       <div className="flex justify-end pt-4">
-        <button onClick={() => alert('Shipping settings saved!')} className="px-6 py-3 bg-[#A68A64] text-[#0a0a0a] rounded-lg hover:bg-[#C4A67A] transition-colors">
-          Save Shipping Settings
+        <button onClick={handleSave} className="flex items-center gap-2 px-6 py-3 bg-[#A68A64] text-[#0a0a0a] rounded-lg hover:bg-[#C4A67A] transition-colors">
+          {saved ? <><CheckCircle className="w-4 h-4" /> Saved!</> : 'Save Shipping Settings'}
         </button>
       </div>
     </div>

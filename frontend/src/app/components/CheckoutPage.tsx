@@ -127,7 +127,13 @@ export function CheckoutPage() {
               })),
             });
             clearCart();
-            navigate('/order-confirmation');
+            navigate('/order-confirmation', {
+              state: {
+                orderItems,
+                shippingAddress: `${shippingData.firstName} ${shippingData.lastName}, ${shippingData.address}, ${shippingData.city}${shippingData.postcode ? ', ' + shippingData.postcode : ''}, ${shippingData.country}`,
+                total,
+              },
+            });
           } else if (status === 'FAILED') {
             setPaymentError('Payment was declined or cancelled. Please try again.');
             setPaymentStatus('failed');

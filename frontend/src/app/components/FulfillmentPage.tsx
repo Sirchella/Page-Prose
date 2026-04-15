@@ -212,7 +212,15 @@ export function FulfillmentPage() {
                 <Printer className="w-4 h-4" />
                 Bulk Print Labels ({selectedOrders.size})
               </button>
-              <button onClick={() => alert('Exporting selected orders...')} className="px-4 py-2 bg-[#A68A64] text-[#0a0a0a] rounded-lg hover:bg-[#8f7556] transition-colors flex items-center gap-2">
+              <button
+                onClick={() => {
+                  const ids = [...selectedOrders].join(', ');
+                  const blob = new Blob([`Selected Orders: ${ids}`], { type: 'text/plain' });
+                  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+                  a.download = 'selected-orders.txt'; a.click();
+                }}
+                className="px-4 py-2 bg-[#A68A64] text-[#0a0a0a] rounded-lg hover:bg-[#8f7556] transition-colors flex items-center gap-2"
+              >
                 <Download className="w-4 h-4" />
                 Export Selected
               </button>
@@ -422,7 +430,7 @@ export function FulfillmentPage() {
                   <Printer className="w-5 h-5" />
                   Print Label
                 </button>
-                <button onClick={() => alert('Downloading PDF...')} className="flex-1 px-6 py-3 bg-[#A68A64] text-[#0a0a0a] rounded-lg hover:bg-[#8f7556] transition-colors flex items-center justify-center gap-2">
+                <button onClick={() => window.print()} className="flex-1 px-6 py-3 bg-[#A68A64] text-[#0a0a0a] rounded-lg hover:bg-[#8f7556] transition-colors flex items-center justify-center gap-2">
                   <Download className="w-5 h-5" />
                   Download PDF
                 </button>

@@ -3,6 +3,7 @@ import { useNavigate, useParams, Link } from 'react-router';
 import { fetchBook, fetchBooks, type Book as ApiBook } from '../api';
 import { books as mockBooks } from '../data/books';
 import { Star, Heart, ShoppingCart, ChevronLeft, ChevronRight, User, Check } from 'lucide-react';
+import { useCart } from '../CartContext';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
@@ -90,6 +91,7 @@ function apiBookToDisplay(b: ApiBook) {
 export function BookDetailPage() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { totalCount } = useCart();
   const mockFallback = mockBooks.find(b => String(b.id) === id) ?? mockBooks[0];
   const [book, setBook] = useState(mockFallback);
   const [relatedBooks, setRelatedBooks] = useState<RelatedBook[]>([]);
@@ -150,9 +152,11 @@ export function BookDetailPage() {
               </button>
               <button onClick={() => navigate('/cart')} className="relative p-2 md:p-3 bg-[#4A7C2C] rounded-lg hover:bg-[#3d6624] transition-colors">
                 <ShoppingCart className="w-5 h-5 md:w-6 md:h-6 text-white" />
-                <span className="absolute -top-2 -right-2 w-5 h-5 md:w-6 md:h-6 bg-[#A68A64] text-white text-xs rounded-full flex items-center justify-center font-semibold">
-                  3
-                </span>
+                {totalCount > 0 && (
+                  <span className="absolute -top-2 -right-2 w-5 h-5 md:w-6 md:h-6 bg-[#A68A64] text-white text-xs rounded-full flex items-center justify-center font-semibold">
+                    {totalCount}
+                  </span>
+                )}
               </button>
             </div>
           </div>

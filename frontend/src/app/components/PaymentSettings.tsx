@@ -1,7 +1,9 @@
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, CheckCircle } from 'lucide-react';
 import { useState } from 'react';
 
 export function PaymentSettings() {
+  const [saved, setSaved] = useState(false);
+  const handleSave = () => { setSaved(true); setTimeout(() => setSaved(false), 2500); };
   const [stripeEnabled, setStripeEnabled] = useState(true);
   const [paypalEnabled, setPaypalEnabled] = useState(false);
   const [showStripeSecret, setShowStripeSecret] = useState(false);
@@ -158,8 +160,8 @@ export function PaymentSettings() {
 
       {/* Save Button */}
       <div className="flex justify-end pt-4">
-        <button onClick={() => alert('Payment settings saved!')} className="px-6 py-3 bg-[#A68A64] text-[#0a0a0a] rounded-lg hover:bg-[#C4A67A] transition-colors">
-          Save Payment Settings
+        <button onClick={handleSave} className="flex items-center gap-2 px-6 py-3 bg-[#A68A64] text-[#0a0a0a] rounded-lg hover:bg-[#C4A67A] transition-colors">
+          {saved ? <><CheckCircle className="w-4 h-4" /> Saved!</> : 'Save Payment Settings'}
         </button>
       </div>
     </div>

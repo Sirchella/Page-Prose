@@ -1,4 +1,4 @@
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, CheckCircle } from 'lucide-react';
 import { useState } from 'react';
 
 interface TaxRule {
@@ -9,6 +9,8 @@ interface TaxRule {
 }
 
 export function TaxSettings() {
+  const [saved, setSaved] = useState(false);
+  const handleSave = () => { setSaved(true); setTimeout(() => setSaved(false), 2500); };
   const [taxRules, setTaxRules] = useState<TaxRule[]>([
     { id: '1', region: 'United States', state: 'California', rate: '7.25' },
     { id: '2', region: 'United States', state: 'New York', rate: '8.00' },
@@ -140,8 +142,8 @@ export function TaxSettings() {
 
       {/* Save Button */}
       <div className="flex justify-end pt-4">
-        <button onClick={() => alert('Tax settings saved!')} className="px-6 py-3 bg-[#A68A64] text-[#0a0a0a] rounded-lg hover:bg-[#C4A67A] transition-colors">
-          Save Tax Settings
+        <button onClick={handleSave} className="flex items-center gap-2 px-6 py-3 bg-[#A68A64] text-[#0a0a0a] rounded-lg hover:bg-[#C4A67A] transition-colors">
+          {saved ? <><CheckCircle className="w-4 h-4" /> Saved!</> : 'Save Tax Settings'}
         </button>
       </div>
     </div>

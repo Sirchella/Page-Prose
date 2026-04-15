@@ -290,7 +290,7 @@ export function CartPage() {
                 return (
                   <div
                     key={book.id}
-                    onClick={() => navigate(`/books/${book.id}`)}
+                    onClick={() => navigate(`/book/${book.id}`)}
                     className="bg-white border-2 border-[#E8DCC8] rounded-lg overflow-hidden hover:border-[#A68A64] hover:shadow-lg transition-all group cursor-pointer"
                   >
                     <div className="aspect-[3/4] overflow-hidden">
