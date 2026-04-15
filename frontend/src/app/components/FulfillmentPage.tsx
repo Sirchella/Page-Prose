@@ -101,24 +101,21 @@ export function FulfillmentPage() {
   const [showLabelModal, setShowLabelModal] = useState(false);
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
   const [selectedCarrier, setSelectedCarrier] = useState<'UPS' | 'Royal Mail'>('Royal Mail');
-  const [queue, setQueue] = useState<Order[]>(ordersQueue);
+  const [queue, setQueue] = useState<Order[]>([]);
 
   useEffect(() => {
     fetchOrders()
       .then((apiOrders: ApiOrder[]) => {
-        const pending = apiOrders.filter(o => o.status === 'confirmed' || o.status === 'packing');
-        if (pending.length > 0) {
-          setQueue(pending.map(o => ({
-            id: o.id.toString(),
-            orderNumber: `#ORD-${o.id}`,
-            customerName: o.customer_name,
-            email: o.customer_email,
-            items: o.items.map(i => ({ title: `Book #${i.book}`, quantity: i.quantity })),
-            destination: o.shipping_address,
-            country: 'Unknown',
-            totalItems: o.items.reduce((s, i) => s + i.quantity, 0),
-          })));
-        }
+        setQueue(apiOrders.filter(o => o.status !== 'delivered' && o.status !== 'cancelled').map(o => ({
+          id: o.id.toString(),
+          orderNumber: `#ORD-${String(o.id).padStart(4, '0')}`,
+          customerName: o.customer_name,
+          email: o.customer_email,
+          items: o.items.map(i => ({ title: `Book #${i.book}`, quantity: i.quantity })),
+          destination: o.shipping_address,
+          country: '',
+          totalItems: o.items.reduce((s, i) => s + i.quantity, 0),
+        })));
       })
       .catch(() => {});
   }, []);

@@ -1,12 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { ShoppingCart, User, Trash2, Plus, Minus, Tag, ArrowRight, ArrowLeft } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { useCart } from '../CartContext';
+import { fetchBooks, type Book as ApiBook } from '../api';
+
+const mediaBase = (import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api').replace('/api', '');
 
 export function CartPage() {
   const navigate = useNavigate();
   const { items: cartItems, removeItem, updateQuantity, addItem } = useCart();
+  const [recommendations, setRecommendations] = useState<ApiBook[]>([]);
+
+  useEffect(() => {
+    fetchBooks()
+      .then(books => setRecommendations(books.slice(0, 4)))
+      .catch(() => {});
+  }, []);
 
   const [discountCode, setDiscountCode] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; amount: number } | null>(null);
@@ -274,72 +284,43 @@ export function CartPage() {
           <div className="mt-8 md:mt-16">
             <h3 className="text-xl md:text-2xl text-[#2C2416] font-serif mb-4 md:mb-6">You Might Also Like</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
-              {[
-                {
-                  title: 'Educated',
-                  author: 'Tara Westover',
-                  price: 14.99,
-                  image: 'https://images.unsplash.com/photo-1769963121626-7f1885db412c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiaW9ncmFwaHklMjBib29rJTIwY292ZXJ8ZW58MXx8fHwxNzczMzMxODY3fDA&ixlib=rb-4.1.0&q=80&w=1080',
-                },
-                {
-                  title: 'Atomic Habits',
-                  author: 'James Clear',
-                  price: 13.99,
-                  image: 'https://images.unsplash.com/photo-1632847933603-677959bb8ccb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMGJvb2slMjBjb3ZlcnxlbnwxfHx8fDE3NzMzMjU5MjZ8MA&ixlib=rb-4.1.0&q=80&w=1080',
-                },
-                {
-                  title: 'Beach Read',
-                  author: 'Emily Henry',
-                  price: 13.99,
-                  image: 'https://images.unsplash.com/photo-1711185898226-beea7eee0611?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyb21hbmNlJTIwbm92ZWwlMjBib29rJTIwY292ZXJ8ZW58MXx8fHwxNzczMzk0ODQ2fDA&ixlib=rb-4.1.0&q=80&w=1080',
-                },
-                {
-                  title: 'The Name of the Wind',
-                  author: 'Patrick Rothfuss',
-                  price: 15.99,
-                  image: 'https://images.unsplash.com/photo-1711185892188-13f35959d3ca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYW50YXN5JTIwYm9vayUyMGNvdmVyfGVufDF8fHx8MTc3MzM3OTYzNnww&ixlib=rb-4.1.0&q=80&w=1080',
-                },
-              ].map((book, index) => (
-                <div
-                  key={index}
-                  className="bg-white border-2 border-[#E8DCC8] rounded-lg overflow-hidden hover:border-[#A68A64] hover:shadow-lg transition-all group cursor-pointer"
-                >
-                  <div className="aspect-[3/4] overflow-hidden">
-                    <ImageWithFallback
-                      src={book.image}
-                      alt={book.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <div className="p-4">
-                    <h4 className="text-sm font-serif text-[#2C2416] mb-1 line-clamp-2">
-                      {book.title}
-                    </h4>
-                    <p className="text-xs text-[#6B5D4F] mb-2">{book.author}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-lg font-serif text-[#4A7C2C]">
-                        {Math.round(book.price).toLocaleString()} XAF
-                      </span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          addItem({
-                            id: `rec-${index}`,
-                            title: book.title,
-                            author: book.author,
-                            format: 'Paperback',
-                            price: book.price,
-                            coverImage: book.image,
-                          });
-                        }}
-                        className="p-2 bg-[#4A7C2C] text-white rounded-lg hover:bg-[#3d6624] transition-colors"
-                      >
-                        <Plus className="w-4 h-4" />
-                      </button>
+              {recommendations.map((book) => {
+                const coverImage = book.cover_image ? `${mediaBase}${book.cover_image}` : '';
+                const price = parseFloat(book.price);
+                return (
+                  <div
+                    key={book.id}
+                    onClick={() => navigate(`/books/${book.id}`)}
+                    className="bg-white border-2 border-[#E8DCC8] rounded-lg overflow-hidden hover:border-[#A68A64] hover:shadow-lg transition-all group cursor-pointer"
+                  >
+                    <div className="aspect-[3/4] overflow-hidden">
+                      <ImageWithFallback
+                        src={coverImage}
+                        alt={book.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                    <div className="p-4">
+                      <h4 className="text-sm font-serif text-[#2C2416] mb-1 line-clamp-2">{book.title}</h4>
+                      <p className="text-xs text-[#6B5D4F] mb-2">{book.author}</p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-lg font-serif text-[#4A7C2C]">
+                          {Math.round(price).toLocaleString()} XAF
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            addItem({ id: String(book.id), title: book.title, author: book.author, format: 'Paperback', price, coverImage });
+                          }}
+                          className="p-2 bg-[#4A7C2C] text-white rounded-lg hover:bg-[#3d6624] transition-colors"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}

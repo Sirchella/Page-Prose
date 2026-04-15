@@ -191,13 +191,11 @@ function mapApiToOrder(o: ApiOrder): Order {
 }
 
 function OrderPipelineContent() {
-  const [orders, setOrders] = useState<Order[]>(generateOrders());
+  const [orders, setOrders] = useState<Order[]>([]);
 
   useEffect(() => {
     fetchOrders()
-      .then(apiOrders => {
-        if (apiOrders.length > 0) setOrders(apiOrders.map(mapApiToOrder));
-      })
+      .then(apiOrders => setOrders(apiOrders.map(mapApiToOrder)))
       .catch(() => {});
   }, []);
   const [searchQuery, setSearchQuery] = useState('');

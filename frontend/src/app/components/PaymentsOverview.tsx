@@ -127,7 +127,7 @@ function mapOrderToTransaction(o: Awaited<ReturnType<typeof fetchOrders>>[number
 }
 
 export function PaymentsOverview() {
-  const [transactions, setTransactions] = useState<Transaction[]>(generateTransactions());
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [refundDialogOpen, setRefundDialogOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [refundReason, setRefundReason] = useState('');
@@ -136,19 +136,15 @@ export function PaymentsOverview() {
   useEffect(() => {
     fetchOrders()
       .then((orders) => {
-        if (orders.length > 0) {
-          setTransactions(orders.map(mapOrderToTransaction).sort(
-            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-          ));
-        }
+        setTransactions(orders.map(mapOrderToTransaction).sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        ));
       })
       .catch(() => {});
   }, []);
 
-  const todayTransactions = transactions.filter((tx) => {
-    const today = new Date('2026-03-15').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    return tx.date === today;
-  });
+  const todayStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const todayTransactions = transactions.filter((tx) => tx.date === todayStr);
 
   const totalCollectedToday = todayTransactions
     .filter((tx) => tx.status === 'Success')

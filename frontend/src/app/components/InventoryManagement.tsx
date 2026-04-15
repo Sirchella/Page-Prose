@@ -66,21 +66,19 @@ const generateInventoryData = (): InventoryItem[] => {
 type StockStatus = 'critical' | 'low' | 'good';
 
 export function InventoryManagement() {
-  const [inventory, setInventory] = useState<InventoryItem[]>(generateInventoryData());
+  const [inventory, setInventory] = useState<InventoryItem[]>([]);
 
   useEffect(() => {
     fetchBooks()
       .then(books => {
-        if (books.length > 0) {
-          setInventory(books.map(b => ({
-            id: b.id.toString(),
-            title: b.title,
-            author: b.author,
-            currentStock: b.stock,
-            reservedUnits: 0,
-            restockThreshold: 20,
-          })));
-        }
+        setInventory(books.map(b => ({
+          id: b.id.toString(),
+          title: b.title,
+          author: b.author,
+          currentStock: b.stock,
+          reservedUnits: 0,
+          restockThreshold: 20,
+        })));
       })
       .catch(() => {});
   }, []);

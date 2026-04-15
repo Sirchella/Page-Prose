@@ -26,7 +26,7 @@ function mapApiBook(b: ApiBook): DisplayBook {
     price: parseFloat(b.price),
     genre: b.genre,
     format: ['Paperback'],
-    coverImage: b.cover_image ? `http://localhost:8000${b.cover_image}` : '',
+    coverImage: b.cover_image ? `${(import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api').replace('/api', '')}${b.cover_image}` : '',
     inStock: b.stock > 0,
     isbn: b.isbn,
   };
@@ -43,14 +43,12 @@ export function BrowsePage() {
   const [showInStock, setShowInStock] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
-  const [books, setBooks] = useState<DisplayBook[]>(mockBooks.map(b => ({ ...b, id: String(b.id) })));
+  const [books, setBooks] = useState<DisplayBook[]>([]);
 
   useEffect(() => {
     fetchBooks()
-      .then(apiBooks => {
-        if (apiBooks.length > 0) setBooks(apiBooks.map(mapApiBook));
-      })
-      .catch(() => {/* backend not running — use mock data */});
+      .then(apiBooks => setBooks(apiBooks.map(mapApiBook)))
+      .catch(() => {});
   }, []);
 
   const handleAddToCart = (book: DisplayBook) => {

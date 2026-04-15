@@ -73,23 +73,71 @@ const genreRevenueData = [
 
 export function AnalyticsDashboard() {
   const [dateRange, setDateRange] = useState('Last 30 Days');
-  const [liveRevenue, setLiveRevenue] = useState<number | null>(null);
-  const [liveOrders, setLiveOrders] = useState<number | null>(null);
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [totalSales, setTotalSales] = useState(0);
+  const [liveMonthlyRevenue, setLiveMonthlyRevenue] = useState(monthlyRevenueData);
+  const [liveOrderVolume, setLiveOrderVolume] = useState(orderVolumeData);
+  const [liveTopBooks, setLiveTopBooks] = useState(topBooksData);
+  const [liveGenreRevenue, setLiveGenreRevenue] = useState(genreRevenueData);
 
   useEffect(() => {
     Promise.all([fetchOrders(), fetchBooks()])
-      .then(([orders, _books]) => {
-        const revenue = orders
-          .filter(o => o.status !== 'cancelled')
-          .reduce((s, o) => s + parseFloat(o.total_price), 0);
-        setLiveRevenue(revenue);
-        setLiveOrders(orders.filter(o => o.status !== 'cancelled').length);
+      .then(([orders, books]) => {
+        const active = orders.filter(o => o.status !== 'cancelled');
+        setTotalRevenue(active.reduce((s, o) => s + parseFloat(o.total_price), 0));
+        setTotalSales(active.length);
+
+        // Monthly revenue from real orders
+        const byMonth: Record<string, number> = {};
+        active.forEach(o => {
+          const m = new Date(o.created_at).toLocaleString('en-US', { month: 'short' });
+          byMonth[m] = (byMonth[m] ?? 0) + parseFloat(o.total_price);
+        });
+        if (Object.keys(byMonth).length > 0) {
+          setLiveMonthlyRevenue(Object.entries(byMonth).map(([month, revenue]) => ({ month, revenue })));
+        }
+
+        // Order volume by date
+        const byDate: Record<string, number> = {};
+        active.forEach(o => {
+          const d = new Date(o.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          byDate[d] = (byDate[d] ?? 0) + 1;
+        });
+        if (Object.keys(byDate).length > 0) {
+          setLiveOrderVolume(Object.entries(byDate).map(([date, orders]) => ({ date, orders })));
+        }
+
+        // Top books by qty sold (cross-reference book IDs)
+        const bookQty: Record<number, number> = {};
+        active.forEach(o => o.items.forEach(i => { bookQty[i.book] = (bookQty[i.book] ?? 0) + i.quantity; }));
+        const topBookEntries = Object.entries(bookQty).sort((a, b) => b[1] - a[1]).slice(0, 5);
+        if (topBookEntries.length > 0) {
+          setLiveTopBooks(topBookEntries.map(([bookId, sales]) => {
+            const found = books.find(b => b.id === parseInt(bookId));
+            return { title: found?.title ?? `Book #${bookId}`, sales };
+          }));
+        }
+
+        // Genre revenue
+        const genreRev: Record<string, { sales: number; revenue: number }> = {};
+        active.forEach(o => {
+          o.items.forEach(i => {
+            const book = books.find(b => b.id === i.book);
+            const genre = book?.genre ?? 'Unknown';
+            if (!genreRev[genre]) genreRev[genre] = { sales: 0, revenue: 0 };
+            genreRev[genre].sales += i.quantity;
+            genreRev[genre].revenue += parseFloat(i.price) * i.quantity;
+          });
+        });
+        if (Object.keys(genreRev).length > 0) {
+          setLiveGenreRevenue(Object.entries(genreRev).map(([genre, { sales, revenue }]) => ({
+            genre, sales, revenue, avgPrice: sales > 0 ? revenue / sales : 0,
+          })));
+        }
       })
       .catch(() => {});
   }, []);
 
-  const totalRevenue = liveRevenue ?? genreRevenueData.reduce((sum, item) => sum + item.revenue, 0);
-  const totalSales = liveOrders ?? genreRevenueData.reduce((sum, item) => sum + item.sales, 0);
   const abandonmentRate = ((cartData[1].value / (cartData[0].value + cartData[1].value)) * 100).toFixed(1);
 
   return (
@@ -135,7 +183,7 @@ export function AnalyticsDashboard() {
         <div className="bg-[#1a1a1a] border border-[#262626] rounded-lg p-6">
           <h3 className="text-lg text-[#f5f5f5] mb-6">Monthly Revenue</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={monthlyRevenueData}>
+            <BarChart data={liveMonthlyRevenue}>
               <CartesianGrid strokeDasharray="3 3" stroke="#262626" />
               <XAxis 
                 dataKey="month" 
@@ -167,7 +215,7 @@ export function AnalyticsDashboard() {
         <div className="bg-[#1a1a1a] border border-[#262626] rounded-lg p-6">
           <h3 className="text-lg text-[#f5f5f5] mb-6">Top 5 Best-Selling Books</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={topBooksData} layout="vertical">
+            <BarChart data={liveTopBooks} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="#262626" />
               <XAxis 
                 type="number" 
@@ -201,7 +249,7 @@ export function AnalyticsDashboard() {
         <div className="bg-[#1a1a1a] border border-[#262626] rounded-lg p-6">
           <h3 className="text-lg text-[#f5f5f5] mb-6">Order Volume Over Time</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={orderVolumeData}>
+            <LineChart data={liveOrderVolume}>
               <CartesianGrid strokeDasharray="3 3" stroke="#262626" />
               <XAxis 
                 dataKey="date" 
@@ -296,7 +344,7 @@ export function AnalyticsDashboard() {
               </tr>
             </thead>
             <tbody>
-              {genreRevenueData.map((genre, index) => {
+              {liveGenreRevenue.map((genre, index) => {
                 const percentage = (genre.revenue / totalRevenue * 100).toFixed(1);
                 return (
                   <tr key={index} className="border-b border-[#262626] hover:bg-[#1a1a1a]/50 transition-colors">

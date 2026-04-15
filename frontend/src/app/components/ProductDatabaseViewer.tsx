@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { fetchBooks } from '../api';
 import {
   Database,
   Download,
@@ -65,8 +66,26 @@ type SortField = 'id' | 'title' | 'author' | 'genre' | 'isbn' | 'price' | 'stock
 type SortDirection = 'asc' | 'desc' | null;
 
 export function ProductDatabaseViewer() {
-  const [books] = useState(generateMockBooks());
+  const [books, setBooks] = useState<ReturnType<typeof generateMockBooks>>([]);
   const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    fetchBooks()
+      .then(apiBooks => {
+        setBooks(apiBooks.map(b => ({
+          id: String(b.id),
+          title: b.title,
+          author: b.author,
+          genre: b.genre,
+          isbn: b.isbn,
+          price: b.price,
+          stock: b.stock,
+          createdDate: new Date(b.created_at).toLocaleDateString(),
+          lastUpdated: new Date(b.created_at).toLocaleDateString(),
+        })));
+      })
+      .catch(() => {});
+  }, []);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
@@ -208,7 +227,7 @@ export function ProductDatabaseViewer() {
                       <Button variant="outline" onClick={() => setImportDialogOpen(false)} className="border-[#262626] text-[#f5f5f5] hover:bg-[#262626]">
                         Cancel
                       </Button>
-                      <Button onClick={() => { alert('Importing...'); setImportDialogOpen(false); }} className="bg-[#A68A64] hover:bg-[#8B7355]">
+                      <Button onClick={() => setImportDialogOpen(false)} className="bg-[#A68A64] hover:bg-[#8B7355]">
                         Upload & Import
                       </Button>
                     </div>

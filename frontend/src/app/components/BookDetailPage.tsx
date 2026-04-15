@@ -75,7 +75,7 @@ function apiBookToDisplay(b: ApiBook) {
     paperbackPrice: parseFloat(b.price),
     genre: b.genre,
     format: ['Paperback'] as string[],
-    coverImage: b.cover_image ? `http://localhost:8000${b.cover_image}` : bookImages[0],
+    coverImage: b.cover_image ? `${(import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api').replace('/api', '')}${b.cover_image}` : bookImages[0],
     inStock: b.stock > 0,
     rating: 4.5,
     reviewCount: 0,
@@ -92,28 +92,23 @@ export function BookDetailPage() {
   const { id } = useParams();
   const mockFallback = mockBooks.find(b => String(b.id) === id) ?? mockBooks[0];
   const [book, setBook] = useState(mockFallback);
-  const [relatedBooks, setRelatedBooks] = useState<RelatedBook[]>(
-    mockBooks.filter(b => String(b.id) !== id).slice(0, 5).map(b => ({
-      id: String(b.id), title: b.title, author: b.author, price: b.price, coverImage: b.coverImage, rating: b.rating,
-    }))
-  );
+  const [relatedBooks, setRelatedBooks] = useState<RelatedBook[]>([]);
+
+  const mediaBase = (import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api').replace('/api', '');
 
   useEffect(() => {
     if (!id) return;
     fetchBook(id)
       .then(apiBook => setBook(apiBookToDisplay(apiBook)))
-      .catch(() => {/* use mock */});
+      .catch(() => {});
     fetchBooks()
       .then(all => {
-        const others = all.filter(b => String(b.id) !== id).slice(0, 5);
-        if (others.length > 0) {
-          setRelatedBooks(others.map(b => ({
-            id: String(b.id), title: b.title, author: b.author,
-            price: parseFloat(b.price),
-            coverImage: b.cover_image ? `http://localhost:8000${b.cover_image}` : bookImages[0],
-            rating: 4.5,
-          })));
-        }
+        setRelatedBooks(all.filter(b => String(b.id) !== id).slice(0, 5).map(b => ({
+          id: String(b.id), title: b.title, author: b.author,
+          price: parseFloat(b.price),
+          coverImage: b.cover_image ? `${mediaBase}${b.cover_image}` : bookImages[0],
+          rating: 4.5,
+        })));
       })
       .catch(() => {});
   }, [id]);
