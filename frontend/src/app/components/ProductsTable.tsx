@@ -145,6 +145,7 @@ function apiBooksToDisplay(apiBooks: ApiBook[]): Book[] {
 
 export function ProductsTable() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [editingBook, setEditingBook] = useState<Book | null>(null);
   const [bookList, setBookList] = useState<Book[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('all');
@@ -261,7 +262,7 @@ export function ProductsTable() {
 
         <div className="mt-4 flex items-center justify-between">
           <p className="text-sm text-[#a3a3a3]">
-            Showing {filteredBooks.length} of {books.length} products
+            Showing {filteredBooks.length} of {bookList.length} products
           </p>
           {(searchQuery || selectedGenre !== 'all' || selectedStatus !== 'all') && (
             <button
@@ -323,7 +324,7 @@ export function ProductsTable() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
-                      <button onClick={() => setIsDrawerOpen(true)} className="p-2 text-[#a3a3a3] hover:text-[#A68A64] hover:bg-[#262626] rounded transition-colors">
+                      <button onClick={() => { setEditingBook(book); setIsDrawerOpen(true); }} className="p-2 text-[#a3a3a3] hover:text-[#A68A64] hover:bg-[#262626] rounded transition-colors">
                         <Edit className="w-4 h-4" />
                       </button>
                       <button onClick={() => handleDelete(book.id, book.title)} className="p-2 text-[#a3a3a3] hover:text-[#dc2626] hover:bg-[#262626] rounded transition-colors">
@@ -341,8 +342,16 @@ export function ProductsTable() {
       {/* Drawer */}
       <ProductDrawer
         isOpen={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-        onSave={(newBook) => setBookList(prev => [...prev, ...apiBooksToDisplay([newBook])])}
+        editingBook={editingBook}
+        onClose={() => { setIsDrawerOpen(false); setEditingBook(null); }}
+        onSave={(saved) => {
+          if (editingBook) {
+            setBookList(prev => prev.map(b => b.id === String(saved.id) ? apiBooksToDisplay([saved])[0] : b));
+          } else {
+            setBookList(prev => [...prev, ...apiBooksToDisplay([saved])]);
+          }
+          setEditingBook(null);
+        }}
       />
     </div>
   );

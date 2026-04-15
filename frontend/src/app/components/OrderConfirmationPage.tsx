@@ -1,4 +1,4 @@
-import { useNavigate, useLocation } from 'react-router';
+import { useNavigate, useLocation, Navigate } from 'react-router';
 import { useEffect, useState } from 'react';
 import { CheckCircle, Package, MapPin, Calendar, Truck, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
@@ -25,9 +25,11 @@ export function OrderConfirmationPage() {
     state: { orderItems: OrderItem[]; shippingAddress: string; total: number } | null;
   };
 
-  const orderItems: OrderItem[] = state?.orderItems ?? [];
-  const shippingAddress = state?.shippingAddress ?? '';
-  const total = state?.total ?? orderItems.reduce((s, i) => s + i.price * i.quantity, 0);
+  if (!state?.orderItems?.length) return <Navigate to="/" replace />;
+
+  const orderItems: OrderItem[] = state.orderItems;
+  const shippingAddress = state.shippingAddress ?? '';
+  const total = state.total ?? orderItems.reduce((s, i) => s + i.price * i.quantity, 0);
   const orderNumber = `PP-${Date.now().toString().slice(-7)}`;
 
   const deliveryDate = new Date();

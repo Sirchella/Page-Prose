@@ -29,6 +29,15 @@ async function authHeaders() {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
+function handleResponse(res: Response) {
+  if (res.status === 401) {
+    logout();
+    window.location.href = '/admin/login';
+    throw new Error('Session expired. Please log in again.');
+  }
+  return res;
+}
+
 // ─── Books ───────────────────────────────────────────────────────────────────
 
 export interface Book {
@@ -60,32 +69,21 @@ export async function fetchBook(id: number | string): Promise<Book> {
 
 export async function createBook(data: FormData): Promise<Book> {
   const headers = await authHeaders();
-  const res = await fetch(`${BASE_URL}/books/`, {
-    method: 'POST',
-    headers,
-    body: data,
-  });
-  if (!res.ok) throw new Error('Failed to create book');
+  const res = handleResponse(await fetch(`${BASE_URL}/books/`, { method: 'POST', headers, body: data }));
+  if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.detail ?? JSON.stringify(e) ?? 'Failed to create book'); }
   return res.json();
 }
 
 export async function updateBook(id: number, data: FormData): Promise<Book> {
   const headers = await authHeaders();
-  const res = await fetch(`${BASE_URL}/books/${id}/`, {
-    method: 'PATCH',
-    headers,
-    body: data,
-  });
-  if (!res.ok) throw new Error('Failed to update book');
+  const res = handleResponse(await fetch(`${BASE_URL}/books/${id}/`, { method: 'PATCH', headers, body: data }));
+  if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.detail ?? JSON.stringify(e) ?? 'Failed to update book'); }
   return res.json();
 }
 
 export async function deleteBook(id: number): Promise<void> {
   const headers = await authHeaders();
-  const res = await fetch(`${BASE_URL}/books/${id}/`, {
-    method: 'DELETE',
-    headers,
-  });
+  const res = handleResponse(await fetch(`${BASE_URL}/books/${id}/`, { method: 'DELETE', headers }));
   if (!res.ok) throw new Error('Failed to delete book');
 }
 
@@ -119,7 +117,7 @@ export interface CreateOrderPayload {
 
 export async function fetchOrders(): Promise<Order[]> {
   const headers = await authHeaders();
-  const res = await fetch(`${BASE_URL}/orders/`, { headers });
+  const res = handleResponse(await fetch(`${BASE_URL}/orders/`, { headers }));
   if (!res.ok) throw new Error('Failed to fetch orders');
   const data = await res.json();
   return Array.isArray(data) ? data : data.results ?? [];
@@ -144,11 +142,11 @@ export async function createOrder(payload: CreateOrderPayload): Promise<Order> {
 
 export async function updateOrderStatus(id: number, status: Order['status']): Promise<Order> {
   const headers = await authHeaders();
-  const res = await fetch(`${BASE_URL}/orders/${id}/`, {
+  const res = handleResponse(await fetch(`${BASE_URL}/orders/${id}/`, {
     method: 'PATCH',
     headers: { ...headers, 'Content-Type': 'application/json' },
     body: JSON.stringify({ status }),
-  });
+  }));
   if (!res.ok) throw new Error('Failed to update order status');
   return res.json();
 }

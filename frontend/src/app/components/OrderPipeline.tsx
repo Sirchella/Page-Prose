@@ -214,14 +214,14 @@ function OrderPipelineContent() {
     }
 
     if (dateFilter !== 'all') {
-      const today = new Date('2026-03-15');
+      const today = new Date();
       filtered = filtered.filter((order) => {
         if (dateFilter === 'today') {
           return order.date === today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         } else if (dateFilter === 'week') {
           const weekAgo = new Date(today);
           weekAgo.setDate(weekAgo.getDate() - 7);
-          const orderDate = new Date(order.date + ', 2026');
+          const orderDate = new Date(order.date + ', ' + today.getFullYear());
           return orderDate >= weekAgo;
         }
         return true;
@@ -233,8 +233,8 @@ function OrderPipelineContent() {
 
   const backendStatus: Record<OrderStatus, ApiOrder['status']> = {
     received: 'pending', confirmed: 'confirmed', packing: 'packing',
-    shipped: 'shipped', delivered: 'delivered',
-  };
+    shipped: 'shipped', delivered: 'delivered', cancelled: 'cancelled',
+  } as Record<OrderStatus, ApiOrder['status']>;
 
   const handleDrop = (orderId: string, newStatus: OrderStatus) => {
     setOrders((prev) =>
