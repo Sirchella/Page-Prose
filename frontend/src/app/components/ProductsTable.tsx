@@ -132,7 +132,7 @@ const books: Book[] = [
 function apiBooksToDisplay(apiBooks: ApiBook[]): Book[] {
   return apiBooks.map(b => ({
     id: String(b.id),
-    coverUrl: b.cover_image ? `http://localhost:8000${b.cover_image}` : books[0]?.coverUrl ?? '',
+    coverUrl: b.cover_image ? `${(import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api').replace('/api', '')}${b.cover_image}` : books[0]?.coverUrl ?? '',
     title: b.title,
     author: b.author,
     isbn: b.isbn,
@@ -145,16 +145,14 @@ function apiBooksToDisplay(apiBooks: ApiBook[]): Book[] {
 
 export function ProductsTable() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [bookList, setBookList] = useState<Book[]>(books);
+  const [bookList, setBookList] = useState<Book[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
 
   useEffect(() => {
     fetchBooks()
-      .then(apiBooks => {
-        if (apiBooks.length > 0) setBookList(apiBooksToDisplay(apiBooks));
-      })
+      .then(apiBooks => setBookList(apiBooksToDisplay(apiBooks)))
       .catch(() => {});
   }, []);
 
@@ -341,7 +339,11 @@ export function ProductsTable() {
       </div>
 
       {/* Drawer */}
-      <ProductDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
+      <ProductDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        onSave={(newBook) => setBookList(prev => [...prev, ...apiBooksToDisplay([newBook])])}
+      />
     </div>
   );
 }
