@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router';
-import { fetchBook, fetchBooks, type Book as ApiBook } from '../api';
-import { books as mockBooks } from '../data/books';
+import { fetchBook, fetchBooks, coverUrl, type Book as ApiBook } from '../api';
 import { Star, Heart, ShoppingCart, ChevronLeft, ChevronRight, User, Check } from 'lucide-react';
+import { useCart } from '../CartContext';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
@@ -75,7 +75,7 @@ function apiBookToDisplay(b: ApiBook) {
     paperbackPrice: parseFloat(b.price),
     genre: b.genre,
     format: ['Paperback'] as string[],
-    coverImage: b.cover_image ? `http://localhost:8000${b.cover_image}` : bookImages[0],
+    coverImage: coverUrl(b.cover_image) || bookImages[0],
     inStock: b.stock > 0,
     rating: 4.5,
     reviewCount: 0,
@@ -90,30 +90,26 @@ function apiBookToDisplay(b: ApiBook) {
 export function BookDetailPage() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const mockFallback = mockBooks.find(b => String(b.id) === id) ?? mockBooks[0];
-  const [book, setBook] = useState(mockFallback);
-  const [relatedBooks, setRelatedBooks] = useState<RelatedBook[]>(
-    mockBooks.filter(b => String(b.id) !== id).slice(0, 5).map(b => ({
-      id: String(b.id), title: b.title, author: b.author, price: b.price, coverImage: b.coverImage, rating: b.rating,
-    }))
-  );
+  const { totalCount } = useCart();
+  const [book, setBook] = useState<ReturnType<typeof apiBookToDisplay> | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [relatedBooks, setRelatedBooks] = useState<RelatedBook[]>([]);
 
   useEffect(() => {
     if (!id) return;
+    setLoading(true);
     fetchBook(id)
       .then(apiBook => setBook(apiBookToDisplay(apiBook)))
-      .catch(() => {/* use mock */});
+      .catch(() => {})
+      .finally(() => setLoading(false));
     fetchBooks()
       .then(all => {
-        const others = all.filter(b => String(b.id) !== id).slice(0, 5);
-        if (others.length > 0) {
-          setRelatedBooks(others.map(b => ({
-            id: String(b.id), title: b.title, author: b.author,
-            price: parseFloat(b.price),
-            coverImage: b.cover_image ? `http://localhost:8000${b.cover_image}` : bookImages[0],
-            rating: 4.5,
-          })));
-        }
+        setRelatedBooks(all.filter(b => String(b.id) !== id).slice(0, 5).map(b => ({
+          id: String(b.id), title: b.title, author: b.author,
+          price: parseFloat(b.price),
+          coverImage: coverUrl(b.cover_image) || bookImages[0],
+          rating: 4.5,
+        })));
       })
       .catch(() => {});
   }, [id]);
@@ -122,6 +118,21 @@ export function BookDetailPage() {
   const [selectedFormat, setSelectedFormat] = useState<'Hardback' | 'Paperback'>('Hardback');
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#F5EFE7] flex items-center justify-center">
+        <p className="text-[#6B5D4F] text-lg">Loading…</p>
+      </div>
+    );
+  }
+  if (!book) {
+    return (
+      <div className="min-h-screen bg-[#F5EFE7] flex items-center justify-center">
+        <p className="text-[#6B5D4F] text-lg">Book not found.</p>
+      </div>
+    );
+  }
 
   const hardbackPrice = book.hardbackPrice ?? book.price;
   const paperbackPrice = book.paperbackPrice ?? book.price;
@@ -155,9 +166,11 @@ export function BookDetailPage() {
               </button>
               <button onClick={() => navigate('/cart')} className="relative p-2 md:p-3 bg-[#4A7C2C] rounded-lg hover:bg-[#3d6624] transition-colors">
                 <ShoppingCart className="w-5 h-5 md:w-6 md:h-6 text-white" />
-                <span className="absolute -top-2 -right-2 w-5 h-5 md:w-6 md:h-6 bg-[#A68A64] text-white text-xs rounded-full flex items-center justify-center font-semibold">
-                  3
-                </span>
+                {totalCount > 0 && (
+                  <span className="absolute -top-2 -right-2 w-5 h-5 md:w-6 md:h-6 bg-[#A68A64] text-white text-xs rounded-full flex items-center justify-center font-semibold">
+                    {totalCount}
+                  </span>
+                )}
               </button>
             </div>
           </div>

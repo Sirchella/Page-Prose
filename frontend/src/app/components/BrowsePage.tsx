@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { Search, ShoppingCart, User, ChevronDown, SlidersHorizontal, X } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { fetchBooks, type Book as ApiBook } from '../api';
-import { books as mockBooks } from '../data/books';
+import { fetchBooks, coverUrl, type Book as ApiBook } from '../api';
 import { useCart } from '../CartContext';
 
 type DisplayBook = {
@@ -26,31 +25,29 @@ function mapApiBook(b: ApiBook): DisplayBook {
     price: parseFloat(b.price),
     genre: b.genre,
     format: ['Paperback'],
-    coverImage: b.cover_image ? `http://localhost:8000${b.cover_image}` : '',
+    coverImage: coverUrl(b.cover_image),
     inStock: b.stock > 0,
     isbn: b.isbn,
   };
 }
 
-const genres = ['All', 'African Literature', 'Fiction', 'Mystery & Thriller', 'Science Fiction & Fantasy', 'Romance', 'Non-Fiction', 'Biography', 'Business & Economics', 'Self-Help', 'History', 'Science & Technology', 'Religion & Spirituality', 'Children\'s Books', 'Poetry & Drama'];
+const genres = ['All', 'Fiction', 'Mystery & Thriller', 'Romance', 'Science Fiction', 'Fantasy', 'Poetry', 'Biography', 'Self-Help', 'Historical Fiction', 'Psychology', 'Cooking', 'Travel'];
 
 export function BrowsePage() {
   const navigate = useNavigate();
   const { addItem, totalCount } = useCart();
   const [selectedGenre, setSelectedGenre] = useState('All');
   const [selectedFormats, setSelectedFormats] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000]);
   const [showInStock, setShowInStock] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
-  const [books, setBooks] = useState<DisplayBook[]>(mockBooks.map(b => ({ ...b, id: String(b.id) })));
+  const [books, setBooks] = useState<DisplayBook[]>([]);
 
   useEffect(() => {
     fetchBooks()
-      .then(apiBooks => {
-        if (apiBooks.length > 0) setBooks(apiBooks.map(mapApiBook));
-      })
-      .catch(() => {/* backend not running — use mock data */});
+      .then(apiBooks => setBooks(apiBooks.map(mapApiBook)))
+      .catch(() => {});
   }, []);
 
   const handleAddToCart = (book: DisplayBook) => {
@@ -175,7 +172,7 @@ export function BrowsePage() {
             {/* Price Range */}
             <div className="mb-6 pb-6 border-b border-[#E8DCC8]">
               <h3 className="text-sm font-semibold text-[#2C2416] mb-3">Price Range</h3>
-              <input type="range" min="0" max="50" value={priceRange[1]} onChange={(e) => setPriceRange([0, parseInt(e.target.value)])} className="w-full accent-[#4A7C2C]" />
+              <input type="range" min="0" max="50000" value={priceRange[1]} onChange={(e) => setPriceRange([0, parseInt(e.target.value)])} className="w-full accent-[#4A7C2C]" />
               <div className="flex items-center justify-between text-sm text-[#4A4A4A] mt-2">
                 <span>{Math.round(priceRange[0]).toLocaleString()} XAF</span>
                 <span>{Math.round(priceRange[1]).toLocaleString()} XAF</span>
@@ -205,7 +202,7 @@ export function BrowsePage() {
             </div>
 
             <button
-              onClick={() => { setSelectedGenre('All'); setSelectedFormats([]); setPriceRange([0, 10000]); setShowInStock(false); setSearchQuery(''); setShowMobileFilters(false); }}
+              onClick={() => { setSelectedGenre('All'); setSelectedFormats([]); setPriceRange([0, 50000]); setShowInStock(false); setSearchQuery(''); setShowMobileFilters(false); }}
               className="w-full px-4 py-2 bg-[#E8DCC8] text-[#4A4A4A] rounded-lg hover:bg-[#D4C4B0] transition-colors text-sm"
             >
               Clear All Filters
@@ -254,7 +251,7 @@ export function BrowsePage() {
                   <input
                     type="range"
                     min="0"
-                    max="10000"
+                    max="50000"
                     value={priceRange[1]}
                     onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
                     className="w-full accent-[#4A7C2C]"
@@ -303,7 +300,7 @@ export function BrowsePage() {
                 onClick={() => {
                   setSelectedGenre('All');
                   setSelectedFormats([]);
-                  setPriceRange([0, 10000]);
+                  setPriceRange([0, 50000]);
                   setShowInStock(false);
                   setSearchQuery('');
                 }}
