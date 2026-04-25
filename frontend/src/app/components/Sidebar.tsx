@@ -13,7 +13,6 @@ import {
   ClipboardList,
   Database,
   GitBranch,
-  Store,
   X,
 } from 'lucide-react';
 

@@ -346,7 +346,7 @@ export function AnalyticsDashboard() {
                   {Math.round(totalRevenue).toLocaleString()} XAF
                 </td>
                 <td className="px-6 py-4 text-right text-sm text-green-400">
-                  {Math.round(totalRevenue / totalSales).toLocaleString()} XAF
+                  {totalSales > 0 ? Math.round(totalRevenue / totalSales).toLocaleString() : '—'} {totalSales > 0 ? 'XAF' : ''}
                 </td>
                 <td className="px-6 py-4 text-right text-sm text-[#f5f5f5]">100%</td>
               </tr>
