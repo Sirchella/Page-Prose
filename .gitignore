@@ -25,6 +25,9 @@ frontend/dist/
 # Seed script (one-time use)
 backend/seed_books.py
 
+# Claude Code internal files
+.claude/
+
 # IDEs
 .vscode/
 .idea/

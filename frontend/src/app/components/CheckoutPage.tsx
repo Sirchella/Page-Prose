@@ -115,7 +115,7 @@ export function CheckoutPage() {
 
           if (status === 'SUCCESSFUL') {
             const shippingAddress = `${shippingData.address}, ${shippingData.city}, ${shippingData.postcode}, ${shippingData.country}`;
-            await createOrder({
+            const createdOrder = await createOrder({
               customer_name: `${shippingData.firstName} ${shippingData.lastName}`.trim(),
               customer_email: shippingData.email,
               shipping_address: shippingAddress,
@@ -127,7 +127,16 @@ export function CheckoutPage() {
               })),
             });
             clearCart();
-            navigate('/order-confirmation');
+            navigate('/order-confirmation', {
+              state: {
+                orderId: createdOrder.id,
+                customerName: `${shippingData.firstName} ${shippingData.lastName}`.trim(),
+                customerEmail: shippingData.email,
+                shippingAddress,
+                total,
+                items: orderItems,
+              },
+            });
           } else if (status === 'FAILED') {
             setPaymentError('Payment was declined or cancelled. Please try again.');
             setPaymentStatus('failed');

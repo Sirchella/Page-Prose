@@ -75,7 +75,7 @@ export function OrdersManagement() {
   const [selectedStatus, setSelectedStatus] = useState<StatusFilter>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [orders, setOrders] = useState<Order[]>(mockOrders);
+  const [orders, setOrders] = useState<Order[]>([]);
 
   useEffect(() => {
     fetchOrders()
