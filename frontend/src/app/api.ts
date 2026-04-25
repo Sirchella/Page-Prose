@@ -1,4 +1,12 @@
-const BASE_URL = 'http://localhost:8000/api';
+const BASE_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8000/api';
+const MEDIA_BASE = BASE_URL.replace(/\/api$/, '');
+
+/** Returns the full URL for a book cover image path returned by the API. */
+export function coverUrl(path: string | null | undefined): string {
+  if (!path) return '';
+  if (path.startsWith('http')) return path;
+  return `${MEDIA_BASE}${path}`;
+}
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
 

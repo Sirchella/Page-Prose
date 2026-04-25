@@ -31,7 +31,7 @@ function mapApiBook(b: ApiBook): DisplayBook {
   };
 }
 
-const genres = ['All', 'Fiction', 'Mystery & Thriller', 'Romance', 'Science Fiction', 'Fantasy', 'Poetry', 'Biography', 'Self-Help', 'Historical Fiction', 'Psychology', 'Cooking', 'Travel'];
+const genres = ['All', 'African Literature', 'Fiction', 'Mystery & Thriller', 'Science Fiction & Fantasy', 'Romance', 'Non-Fiction', 'Biography', 'Business & Economics', 'Self-Help', 'History', 'Science & Technology', 'Religion & Spirituality', "Children's Books", 'Poetry & Drama'];
 
 export function BrowsePage() {
   const navigate = useNavigate();

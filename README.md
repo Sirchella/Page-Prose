@@ -1,171 +1,209 @@
-# Page & Prose — Bookstore Web App
+<div align="center">
 
-A full-stack bookstore application with a customer storefront and admin dashboard.
-Payments are processed via **Campay** (MTN Mobile Money & Orange Money — Cameroon).
+# 📖 Page & Prose
+
+### A full-stack online bookstore built for Cameroon
+
+![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=white)
+![Django](https://img.shields.io/badge/Django-6.0-092E20?style=flat-square&logo=django&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind-3-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat-square&logo=python&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
+
+**Browse books · Pay with Mobile Money · Manage everything from an admin dashboard**
+
+</div>
 
 ---
 
-## Project Structure
+## ✨ What is Page & Prose?
+
+Page & Prose is a complete bookstore web application. Customers browse and buy books online and pay with **MTN Mobile Money** or **Orange Money** — no card required. Admins manage inventory, track orders, and monitor sales through a dedicated dashboard.
+
+---
+
+## 🗂 Project Structure
 
 ```
 page-and-prose/
-├── backend/        ← Django REST API
-└── frontend/       ← React + Vite frontend (this folder)
+├── backend/          ← Django REST API (Python)
+│   ├── books/        ← Books app (models, views, serializers)
+│   ├── orders/       ← Orders app + payment integration
+│   └── page_and_prose/  ← Django project settings & URLs
+│
+└── frontend/         ← React + Vite (TypeScript)
+    └── src/
+        └── app/
+            ├── components/   ← All pages and UI components
+            ├── api.ts        ← All API calls in one place
+            └── CartContext.tsx
 ```
 
 ---
 
-## Requirements
+## ⚙️ Requirements
 
-Make sure the following are installed on the machine:
-
-| Tool    | Version          | Download                |
-|---------|------------------|-------------------------|
-| Node.js | v18 or higher    | https://nodejs.org      |
-| Python  | v3.10 or higher  | https://python.org      |
-| pip     | comes with Python | —                      |
+| Tool | Version | Download |
+|------|---------|----------|
+| **Node.js** | v18 or higher | [nodejs.org](https://nodejs.org) |
+| **Python** | v3.10 or higher | [python.org](https://python.org) |
+| **pip** | comes with Python | — |
 
 ---
 
-## 1. Backend Setup (Django)
+## 🚀 Getting Started
 
-### Step 1 — Navigate to the backend folder
+### 1 — Clone the repository
+
+```bash
+git clone https://github.com/Sirchella/Page-Prose.git
+cd Page-Prose
+```
+
+---
+
+### 2 — Backend Setup (Django)
+
 ```bash
 cd backend
-```
-
-### Step 2 — Install Python dependencies
-```bash
 pip install -r requirements.txt
 ```
 
-### Step 3 — Create the `.env` file
-Create a file called `.env` inside `backend/` with the following content:
+Create a `.env` file inside `backend/`:
 
-```
-CAMPAY_APP_USERNAME=your_campay_username_here
-CAMPAY_APP_PASSWORD=your_campay_password_here
+```env
+# Campay Mobile Money (get credentials at campay.net)
+CAMPAY_APP_USERNAME=your_campay_username
+CAMPAY_APP_PASSWORD=your_campay_password
 CAMPAY_BASE_URL=https://demo.campay.net/api/
+
+# Optional — transactional emails via Resend (resend.com)
+RESEND_API_KEY=re_xxxxxxxxxxxx
+FROM_EMAIL=orders@yourdomain.com
+
+# Production only
+# SECRET_KEY=your-long-random-secret-key
+# DEBUG=False
+# ALLOWED_HOSTS=yourdomain.com,your-railway-app.up.railway.app
 ```
 
-> **Note:** Change `CAMPAY_BASE_URL` to `https://www.campay.net/api/` when going live.
-> Get your credentials at https://campay.net
+Run migrations and create your admin account:
 
-### Step 4 — Run database migrations
 ```bash
 python manage.py migrate
-```
-
-### Step 5 — Create an admin account (first time only)
-```bash
 python manage.py createsuperuser
-```
-Follow the prompts to set a username and password. This is what you use to log in to the admin panel at `/admin`.
-
-### Step 6 — Start the backend server
-```bash
 python manage.py runserver
 ```
-The backend will run at: **http://localhost:8000**
+
+> **Backend is now running at** → `http://localhost:8000`
 
 ---
 
-## 2. Frontend Setup (React)
+### 3 — Frontend Setup (React)
 
-### Step 1 — Navigate to the frontend folder
+Open a new terminal:
+
 ```bash
 cd frontend
-```
-
-### Step 2 — Install Node dependencies
-```bash
 npm install
-```
-
-### Step 3 — Start the frontend
-```bash
 npm run dev
 ```
-The app will open at: **http://localhost:5173** (or 5174 / 3000)
+
+> **App is now running at** → `http://localhost:5173`
 
 ---
 
-## 3. Using the App
+## 🛍️ Using the App
 
-### Customer Storefront
-Visit **http://localhost:5173** to browse and purchase books.
-- Browse 85 books across 14 genres (African Literature, Fiction, Mystery, Romance, Non-Fiction, Science, Business, Self-Help, and more)
-- All prices in **XAF** (Central African CFA franc), ranging from 3,000 to 9,500 XAF
-- Add to cart, choose a delivery method, and checkout with MTN MoMo or Orange Money
-- Enter your Cameroon phone number at checkout (e.g. `677123456`)
-- A payment prompt will be sent to your phone via USSD
+### Customer Storefront — `http://localhost:5173`
 
-### Admin Panel
-Visit **http://localhost:5173/admin** and log in with the superuser credentials you created.
-
-Admin features include:
-- Dashboard with sales analytics and revenue charts
-- Products and inventory management (add books, upload covers, update stock)
-- Orders management with status tracking (Pending → Confirmed → Packing → Shipped → Delivered)
-- Order pipeline (kanban-style fulfillment view)
-- Payments overview
-- Shipping, email, tax, and promotion settings
+- Browse **85 books** across **14 genres** (African Literature, Fiction, Mystery & Thriller, Romance, and more)
+- All prices in **XAF** (Central African CFA franc)
+- Filter by genre, price range, format, and availability
+- Add books to cart and checkout in 3 steps:
+  1. Enter shipping address
+  2. Choose delivery method (Standard / Express / Next Day)
+  3. Pay with **MTN MoMo** or **Orange Money** — enter your Cameroonian number and confirm on your phone
 
 ---
 
-## 4. Going Live (Production)
+### Admin Dashboard — `http://localhost:5173/admin`
 
-When ready to accept real payments:
+Log in with the superuser account you created.
 
-1. **Switch Campay to production** — update `backend/.env`:
-   ```
-   CAMPAY_BASE_URL=https://www.campay.net/api/
-   ```
-
-2. **Disable debug mode** — in `backend/page_and_prose/settings.py`:
-   ```python
-   DEBUG = False
-   ```
-
-3. **Set a secure secret key** — replace the `SECRET_KEY` in `settings.py` with a long random string
-
-4. **Update CORS** — add your live domain to `CORS_ALLOWED_ORIGINS` in `settings.py`
-
-5. **Deploy backend** — recommended hosts: Railway, Render, or any Linux VPS
-
-6. **Deploy frontend** — recommended hosts: Vercel or Netlify
-   - Update the API base URL in `src/app/api.ts` to point to your live backend URL
+| Section | What you can do |
+|---------|----------------|
+| **Analytics** | View sales charts, revenue, and top books |
+| **Products** | Add, edit, and delete books; upload cover images |
+| **Inventory** | Monitor and update stock levels |
+| **Orders** | Track orders from Pending → Confirmed → Packing → Shipped → Delivered |
+| **Order Pipeline** | Kanban-style view for managing fulfilment |
+| **Payments** | Overview of all transactions |
+| **Email** | Configure and test transactional emails |
+| **Settings** | Manage shipping zones, tax, and promotions |
 
 ---
 
-## 5. Carrying Over Existing Data
+## 🔒 Security
 
-The database is stored in `backend/db.sqlite3`.
-
-- **Include** this file when moving to another machine to keep all books, orders, and data.
-- **Exclude** it to start fresh (then re-add books through the admin panel).
-
-> Note: `db.sqlite3` is listed in `.gitignore` and will not be pushed to GitHub.
+- **JWT authentication** — admin sessions use short-lived access tokens
+- **Campay payment processing** — we never handle money directly; Campay is a licensed processor
+- **Environment variables** — all credentials (API keys, secrets) stored in `.env`, never committed to git
+- **CORS protection** — only whitelisted origins can call the API
 
 ---
 
-## 6. Troubleshooting
+## 🌍 Deployment
+
+The app is designed to deploy with zero configuration changes:
+
+| Part | Platform | Notes |
+|------|----------|-------|
+| Backend | **Railway** | Auto-deploys from `main` branch; uses `railway.json` start script |
+| Frontend | **Vercel** | Auto-deploys on push; set `VITE_API_URL` to your Railway backend URL |
+
+### Steps to go live
+
+1. Push code to GitHub
+2. Connect your repo to **Railway** (backend) and **Vercel** (frontend)
+3. Add environment variables in each platform's dashboard
+4. Set `CAMPAY_BASE_URL=https://www.campay.net/api/` for real payments
+5. Set `DEBUG=False` and a strong `SECRET_KEY` on Railway
+
+---
+
+## 📦 Carrying Over Data
+
+The database lives in `backend/db.sqlite3`.
+
+- **Moving machines?** Copy `db.sqlite3` to keep all books, orders, and history
+- **Fresh start?** Delete it — migrations will recreate an empty database
+- `db.sqlite3` is in `.gitignore` and is never pushed to GitHub
+
+---
+
+## 🛠 Troubleshooting
 
 | Problem | Fix |
 |---------|-----|
 | Frontend can't reach backend | Make sure Django is running on port 8000 |
-| CORS error in browser | Add your frontend URL to `CORS_ALLOWED_ORIGINS` in `backend/page_and_prose/settings.py` |
-| Campay payment fails | Check `backend/.env` credentials; make sure phone number starts with 237 |
-| Admin login not working | Run `python manage.py createsuperuser` inside the `backend/` folder |
-| Port already in use | Kill the process using that port or use a different port |
-| Books not showing on storefront | Make sure the Django server is running and accessible at port 8000 |
+| CORS error | Add your frontend URL to `CORS_ALLOWED_ORIGINS` in `settings.py` |
+| Payment fails | Check `.env` credentials; phone must be in format `237XXXXXXXXX` |
+| Admin login fails | Run `python manage.py createsuperuser` inside `backend/` |
+| Books not showing | Make sure the Django server is running |
+| Port already in use | Kill the process on that port or use a different one |
+| Images not loading in production | Set `VITE_API_URL` in Vercel to your Railway backend URL |
 
 ---
 
-## Currency
+## 💱 Currency
 
-All prices are in **XAF** (Central African CFA franc — Cameroon).
+All prices are in **XAF** — Central African CFA franc (Cameroon).
 
 ---
 
-*Built with React, Django, Tailwind CSS, and Campay Mobile Money.*
+<div align="center">
+
+*Built with React, Django, Tailwind CSS, and Campay Mobile Money*
+
+</div>

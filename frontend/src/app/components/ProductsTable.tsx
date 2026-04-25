@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Search, Filter, Plus, Edit, Trash2 } from 'lucide-react';
 import { ProductDrawer } from './ProductDrawer';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { fetchBooks, deleteBook, type Book as ApiBook } from '../api';
+import { fetchBooks, deleteBook, coverUrl, type Book as ApiBook } from '../api';
 
 interface Book {
   id: string;
@@ -132,7 +132,7 @@ const books: Book[] = [
 function apiBooksToDisplay(apiBooks: ApiBook[]): Book[] {
   return apiBooks.map(b => ({
     id: String(b.id),
-    coverUrl: b.cover_image ? `http://localhost:8000${b.cover_image}` : books[0]?.coverUrl ?? '',
+    coverUrl: coverUrl(b.cover_image),
     title: b.title,
     author: b.author,
     isbn: b.isbn,

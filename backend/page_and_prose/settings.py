@@ -25,10 +25,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-2a(65uyk^8gec30b1pj%me9aoe4%5r_!551%uvw^1c=4k)t*lj'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-2a(65uyk^8gec30b1pj%me9aoe4%5r_!551%uvw^1c=4k)t*lj')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 # Application definition
 
@@ -65,7 +65,11 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:5174',
 ]
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+_allowed = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1')
+ALLOWED_HOSTS = [h.strip() for h in _allowed.split(',')]
+
+# Allow Railway / Vercel preview URLs automatically
+CORS_ALLOW_ALL_ORIGINS = os.environ.get('CORS_ALLOW_ALL_ORIGINS', 'False') == 'True'
 
 ROOT_URLCONF = 'page_and_prose.urls'
 
@@ -153,3 +157,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 CAMPAY_BASE_URL = os.environ.get('CAMPAY_BASE_URL', 'https://demo.campay.net/api/')
 CAMPAY_APP_USERNAME = os.environ.get('CAMPAY_APP_USERNAME', '')
 CAMPAY_APP_PASSWORD = os.environ.get('CAMPAY_APP_PASSWORD', '')
+
+# Resend transactional emails (optional — emails are skipped if not set)
+RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
+FROM_EMAIL = os.environ.get('FROM_EMAIL', 'noreply@pageandprose.com')
