@@ -90,7 +90,7 @@ function apiBookToDisplay(b: ApiBook) {
 export function BookDetailPage() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { totalCount } = useCart();
+  const { totalCount, addItem } = useCart();
   const [book, setBook] = useState<ReturnType<typeof apiBookToDisplay> | null>(null);
   const [loading, setLoading] = useState(true);
   const [relatedBooks, setRelatedBooks] = useState<RelatedBook[]>([]);
@@ -316,9 +316,26 @@ export function BookDetailPage() {
 
             {/* Action Buttons */}
             <div className="space-y-3 mb-6">
-              <button onClick={() => navigate('/cart')} className="w-full py-4 bg-[#4A7C2C] text-white rounded-lg hover:bg-[#3d6624] transition-colors flex items-center justify-center gap-3 text-lg font-semibold">
+              <button
+                onClick={() => {
+                  // Add the selected quantity to cart
+                  for (let i = 0; i < quantity; i++) {
+                    addItem({
+                      id: book.id,
+                      title: book.title,
+                      author: book.author,
+                      format: selectedFormat,
+                      price: currentPrice,
+                      coverImage: book.coverImage,
+                    });
+                  }
+                  navigate('/cart');
+                }}
+                disabled={!book.inStock}
+                className="w-full py-4 bg-[#4A7C2C] text-white rounded-lg hover:bg-[#3d6624] transition-colors flex items-center justify-center gap-3 text-lg font-semibold disabled:bg-[#D4C4B0] disabled:cursor-not-allowed"
+              >
                 <ShoppingCart className="w-6 h-6" />
-                Add to Cart
+                {book.inStock ? 'Add to Cart' : 'Out of Stock'}
               </button>
               <button
                 onClick={() => setIsWishlisted(!isWishlisted)}

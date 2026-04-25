@@ -1,5 +1,6 @@
 import { X, Upload } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { createBook } from '../api';
 
 interface ProductDrawerProps {
   isOpen: boolean;
@@ -16,12 +17,51 @@ export function ProductDrawer({ isOpen, onClose }: ProductDrawerProps) {
     isbn: '',
     description: '',
   });
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    setCoverFile(file);
+    if (file) {
+      setCoverPreview(URL.createObjectURL(file));
+    } else {
+      setCoverPreview(null);
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({ title: '', author: '', genre: '', price: '', stock: '', isbn: '', description: '' });
+    setCoverFile(null);
+    setCoverPreview(null);
+    setSaveError('');
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log('Form submitted:', formData);
-    onClose();
+    setSaveError('');
+    setSaving(true);
+    try {
+      const fd = new FormData();
+      fd.append('title', formData.title);
+      fd.append('author', formData.author);
+      fd.append('genre', formData.genre);
+      fd.append('price', formData.price);
+      fd.append('stock', formData.stock);
+      fd.append('isbn', formData.isbn);
+      fd.append('description', formData.description);
+      if (coverFile) fd.append('cover_image', coverFile);
+      await createBook(fd);
+      resetForm();
+      onClose();
+    } catch (err: unknown) {
+      setSaveError(err instanceof Error ? err.message : 'Failed to save book. Check your connection.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -62,13 +102,27 @@ export function ProductDrawer({ isOpen, onClose }: ProductDrawerProps) {
           {/* Cover Image Upload */}
           <div>
             <label className="block text-sm text-[#f5f5f5] mb-2">Cover Image</label>
-            <div className="border-2 border-dashed border-[#262626] rounded-lg p-8 text-center hover:border-[#A68A64] transition-colors cursor-pointer">
-              <Upload className="w-12 h-12 text-[#a3a3a3] mx-auto mb-4" />
-              <p className="text-sm text-[#f5f5f5] mb-1">Click to upload or drag and drop</p>
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className="border-2 border-dashed border-[#262626] rounded-lg p-8 text-center hover:border-[#A68A64] transition-colors cursor-pointer"
+            >
+              {coverPreview ? (
+                <img src={coverPreview} alt="Cover preview" className="w-24 h-32 object-cover rounded mx-auto mb-2" />
+              ) : (
+                <Upload className="w-12 h-12 text-[#a3a3a3] mx-auto mb-4" />
+              )}
+              <p className="text-sm text-[#f5f5f5] mb-1">{coverFile ? coverFile.name : 'Click to upload or drag and drop'}</p>
               <p className="text-xs text-[#a3a3a3]">PNG, JPG up to 5MB</p>
-              <input type="file" className="hidden" accept="image/*" />
+              <input ref={fileInputRef} type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
             </div>
           </div>
+
+          {/* Save Error */}
+          {saveError && (
+            <div className="px-4 py-3 bg-red-900/30 border border-red-500/40 rounded-lg text-sm text-red-400">
+              {saveError}
+            </div>
+          )}
 
           {/* Title */}
           <div>
@@ -186,16 +240,17 @@ export function ProductDrawer({ isOpen, onClose }: ProductDrawerProps) {
           <div className="flex gap-4 pt-4">
             <button
               type="button"
-              onClick={onClose}
+              onClick={() => { resetForm(); onClose(); }}
               className="flex-1 px-6 py-3 bg-[#262626] text-[#f5f5f5] rounded-lg hover:bg-[#333333] transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-6 py-3 bg-[#A68A64] text-[#0a0a0a] rounded-lg hover:bg-[#C4A67A] transition-colors"
+              disabled={saving}
+              className="flex-1 px-6 py-3 bg-[#A68A64] text-[#0a0a0a] rounded-lg hover:bg-[#C4A67A] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Add Book
+              {saving ? 'Saving…' : 'Add Book'}
             </button>
           </div>
         </form>

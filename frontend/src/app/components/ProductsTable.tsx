@@ -263,7 +263,7 @@ export function ProductsTable() {
 
         <div className="mt-4 flex items-center justify-between">
           <p className="text-sm text-[#a3a3a3]">
-            Showing {filteredBooks.length} of {books.length} products
+            Showing {filteredBooks.length} of {bookList.length} products
           </p>
           {(searchQuery || selectedGenre !== 'all' || selectedStatus !== 'all') && (
             <button
