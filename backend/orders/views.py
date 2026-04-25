@@ -4,7 +4,7 @@ from django.conf import settings
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Order
 from .serializers import OrderSerializer, OrderCreateSerializer
 from .emails import send_test_email
@@ -13,6 +13,13 @@ from .emails import send_test_email
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+
+    def get_permissions(self):
+        # Customers can place orders without logging in.
+        # Everything else (list, retrieve, update, delete) requires admin auth.
+        if self.action == 'create':
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
     def get_serializer_class(self):
         if self.action == 'create':
