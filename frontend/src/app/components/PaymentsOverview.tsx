@@ -55,52 +55,6 @@ interface Transaction {
   orderId: string;
 }
 
-const generateTransactions = (): Transaction[] => {
-  const customers = [
-    { name: 'Sarah Johnson', email: 'sarah.j@email.com' },
-    { name: 'Michael Chen', email: 'm.chen@email.com' },
-    { name: 'Emma Wilson', email: 'emma.w@email.com' },
-    { name: 'David Martinez', email: 'd.martinez@email.com' },
-    { name: 'Lisa Anderson', email: 'lisa.a@email.com' },
-    { name: 'James Brown', email: 'james.b@email.com' },
-    { name: 'Rachel Green', email: 'r.green@email.com' },
-    { name: 'Thomas Wright', email: 't.wright@email.com' },
-    { name: 'Amy Foster', email: 'amy.f@email.com' },
-    { name: 'Kevin Taylor', email: 'k.taylor@email.com' },
-    { name: 'Jennifer Lee', email: 'jen.lee@email.com' },
-    { name: 'Robert Davis', email: 'rob.davis@email.com' },
-  ];
-
-  const statuses: PaymentStatus[] = ['Success', 'Success', 'Success', 'Success', 'Success', 'Success', 'Pending', 'Failed', 'Refunded'];
-  const methods: PaymentMethod[] = ['MTN MoMo', 'Orange Money'];
-
-  const today = new Date('2026-03-15');
-  const transactions: Transaction[] = [];
-
-  for (let i = 0; i < 25; i++) {
-    const daysAgo = Math.floor(Math.random() * 7);
-    const txDate = new Date(today);
-    txDate.setDate(txDate.getDate() - daysAgo);
-
-    const customer = customers[Math.floor(Math.random() * customers.length)];
-    const status = statuses[Math.floor(Math.random() * statuses.length)];
-    const method = methods[Math.floor(Math.random() * methods.length)];
-
-    transactions.push({
-      id: `TXN${String(1000 + i).padStart(6, '0')}`,
-      customer: customer.name,
-      customerEmail: customer.email,
-      amount: parseFloat((Math.random() * 150 + 10).toFixed(2)),
-      paymentMethod: method,
-      status: status,
-      date: txDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-      time: `${Math.floor(Math.random() * 12) + 1}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')} ${Math.random() > 0.5 ? 'PM' : 'AM'}`,
-      orderId: `ORD${String(2000 + i).padStart(5, '0')}`,
-    });
-  }
-
-  return transactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-};
 
 function mapOrderToTransaction(o: Awaited<ReturnType<typeof fetchOrders>>[number]): Transaction {
   const statusMap: Record<string, PaymentStatus> = {
@@ -127,7 +81,7 @@ function mapOrderToTransaction(o: Awaited<ReturnType<typeof fetchOrders>>[number
 }
 
 export function PaymentsOverview() {
-  const [transactions, setTransactions] = useState<Transaction[]>(generateTransactions());
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [refundDialogOpen, setRefundDialogOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [refundReason, setRefundReason] = useState('');

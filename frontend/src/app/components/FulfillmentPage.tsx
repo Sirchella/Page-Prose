@@ -18,90 +18,13 @@ interface Order {
   totalItems: number;
 }
 
-const ordersQueue: Order[] = [
-  {
-    id: '1',
-    orderNumber: '#ORD-2847',
-    customerName: 'Sarah Johnson',
-    email: 'sarah.j@email.com',
-    items: [
-      { title: 'The Midnight Library', quantity: 1 },
-      { title: 'Atomic Habits', quantity: 2 },
-    ],
-    destination: '42 Oxford Street, London, W1D 1BS',
-    country: 'United Kingdom',
-    totalItems: 3,
-  },
-  {
-    id: '2',
-    orderNumber: '#ORD-2848',
-    customerName: 'Michael Chen',
-    email: 'm.chen@email.com',
-    items: [
-      { title: 'Project Hail Mary', quantity: 1 },
-    ],
-    destination: '156 High Street, Manchester, M4 1HP',
-    country: 'United Kingdom',
-    totalItems: 1,
-  },
-  {
-    id: '3',
-    orderNumber: '#ORD-2849',
-    customerName: 'Emma Thompson',
-    email: 'emma.t@email.com',
-    items: [
-      { title: 'Where the Crawdads Sing', quantity: 1 },
-      { title: 'The Silent Patient', quantity: 1 },
-    ],
-    destination: '789 Fifth Avenue, New York, NY 10022',
-    country: 'United States',
-    totalItems: 2,
-  },
-  {
-    id: '4',
-    orderNumber: '#ORD-2850',
-    customerName: 'James Wilson',
-    email: 'j.wilson@email.com',
-    items: [
-      { title: 'Educated', quantity: 1 },
-    ],
-    destination: '23 George Street, Edinburgh, EH2 2PB',
-    country: 'United Kingdom',
-    totalItems: 1,
-  },
-  {
-    id: '5',
-    orderNumber: '#ORD-2851',
-    customerName: 'Sophie Martin',
-    email: 'sophie.m@email.com',
-    items: [
-      { title: 'The Thursday Murder Club', quantity: 2 },
-      { title: 'Normal People', quantity: 1 },
-    ],
-    destination: '45 Grafton Street, Dublin, D02 FK84',
-    country: 'Ireland',
-    totalItems: 3,
-  },
-  {
-    id: '6',
-    orderNumber: '#ORD-2852',
-    customerName: 'David Brown',
-    email: 'd.brown@email.com',
-    items: [
-      { title: 'The Invisible Life of Addie LaRue', quantity: 1 },
-    ],
-    destination: '12 King Street, Bristol, BS1 4EF',
-    country: 'United Kingdom',
-    totalItems: 1,
-  },
-];
 
 export function FulfillmentPage() {
   const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
   const [showLabelModal, setShowLabelModal] = useState(false);
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
   const [selectedCarrier, setSelectedCarrier] = useState<'UPS' | 'Royal Mail'>('Royal Mail');
-  const [queue, setQueue] = useState<Order[]>(ordersQueue);
+  const [queue, setQueue] = useState<Order[]>([]);
 
   useEffect(() => {
     fetchOrders()
@@ -184,14 +107,14 @@ export function FulfillmentPage() {
             <CheckCircle2 className="w-5 h-5 text-[#4A7C2C]" />
             <p className="text-sm text-[#a3a3a3]">Shipped Today</p>
           </div>
-          <p className="text-3xl text-[#f5f5f5]">23</p>
+          <p className="text-3xl text-[#f5f5f5]">0</p>
         </div>
         <div className="bg-[#1a1a1a] border border-[#262626] rounded-lg p-6">
           <div className="flex items-center gap-3 mb-2">
             <MapPin className="w-5 h-5 text-[#A68A64]" />
             <p className="text-sm text-[#a3a3a3]">In Transit</p>
           </div>
-          <p className="text-3xl text-[#f5f5f5]">87</p>
+          <p className="text-3xl text-[#f5f5f5]">0</p>
         </div>
       </div>
 

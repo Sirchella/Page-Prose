@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { fetchBooks, type Book as ApiBook } from '../api';
 import {
   Database,
   Download,
@@ -28,44 +29,27 @@ import {
   DialogTrigger,
 } from './ui/dialog';
 
-// Mock book data
-const generateMockBooks = () => {
-  const genres = ['Fiction', 'Non-Fiction', 'Mystery', 'Romance', 'Sci-Fi', 'Biography', 'History', 'Self-Help'];
-  const titles = [
-    'The Silent Echo', 'Whispers in Time', 'Beyond the Horizon', 'The Last Garden',
-    'Midnight Chronicles', 'The Forgotten Path', 'Echoes of Tomorrow', 'The Silver Thread',
-    'Dancing with Shadows', 'The Crimson Key', 'Tales of the North', 'The Ancient Code',
-    'Beneath the Stars', 'The Hidden Door', 'Waves of Memory', 'The Eternal Flame',
-    'Secrets of the Sea', 'The Golden Hour', 'Through the Mist', 'The Broken Compass',
-    'Voices in the Dark', 'The Sapphire Crown', 'Dreams of Yesterday', 'The Iron Gate',
-    'Fragments of Light', 'The Wandering Soul', 'Tales from the Edge', 'The Copper Mountain',
-    'Echoes of Silence', 'The Velvet Shadow', 'Beneath the Surface', 'The Amber Stone',
-  ];
-  const authors = [
-    'Emma Richardson', 'James Mitchell', 'Sarah Chen', 'David Walsh',
-    'Maria Garcia', 'Robert Foster', 'Lisa Anderson', 'Michael Brown',
-    'Jennifer Lee', 'Thomas Wright', 'Amy Carter', 'Daniel Moore',
-    'Rachel Green', 'Christopher Davis', 'Laura Martinez', 'Kevin Taylor',
-  ];
-
-  return titles.map((title, index) => ({
-    id: `BK${String(index + 1001).padStart(5, '0')}`,
-    title,
-    author: authors[index % authors.length],
-    genre: genres[index % genres.length],
-    isbn: `978-${Math.floor(Math.random() * 10)}-${String(Math.floor(Math.random() * 100000)).padStart(5, '0')}-${String(Math.floor(Math.random() * 100)).padStart(2, '0')}-${Math.floor(Math.random() * 10)}`,
-    price: (Math.random() * 40 + 10).toFixed(2),
-    stock: Math.floor(Math.random() * 200),
-    createdDate: new Date(2024, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toLocaleDateString(),
-    lastUpdated: new Date(2026, Math.floor(Math.random() * 3), Math.floor(Math.random() * 15) + 1).toLocaleDateString(),
-  }));
-};
 
 type SortField = 'id' | 'title' | 'author' | 'genre' | 'isbn' | 'price' | 'stock' | 'createdDate' | 'lastUpdated';
 type SortDirection = 'asc' | 'desc' | null;
 
 export function ProductDatabaseViewer() {
-  const [books] = useState(generateMockBooks());
+  const [books, setBooks] = useState<{id: string; title: string; author: string; genre: string; isbn: string; price: string; stock: number; createdDate: string; lastUpdated: string}[]>([]);
+  useEffect(() => {
+    fetchBooks().then((apiBooks: ApiBook[]) => {
+      setBooks(apiBooks.map(b => ({
+        id: `BK${String(b.id).padStart(5, '0')}`,
+        title: b.title,
+        author: b.author,
+        genre: b.genre,
+        isbn: b.isbn || '—',
+        price: b.price,
+        stock: b.stock,
+        createdDate: new Date(b.created_at).toLocaleDateString(),
+        lastUpdated: new Date(b.created_at).toLocaleDateString(),
+      })));
+    }).catch(() => {});
+  }, []);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState<SortField | null>(null);

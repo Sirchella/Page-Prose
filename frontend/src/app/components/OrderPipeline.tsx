@@ -191,7 +191,7 @@ function mapApiToOrder(o: ApiOrder): Order {
 }
 
 function OrderPipelineContent() {
-  const [orders, setOrders] = useState<Order[]>(generateOrders());
+  const [orders, setOrders] = useState<Order[]>([]);
 
   useEffect(() => {
     fetchOrders()
