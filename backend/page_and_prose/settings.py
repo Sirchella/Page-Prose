@@ -64,13 +64,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:3000',
     'http://127.0.0.1:5173',
     'http://127.0.0.1:5174',
-    'https://page-prose.vercel.app',
 ]
-
-# Allow extra origins to be injected via env var (comma-separated)
-_extra_cors = os.environ.get('CORS_ALLOWED_ORIGINS', '')
-if _extra_cors:
-    CORS_ALLOWED_ORIGINS += [o.strip() for o in _extra_cors.split(',') if o.strip()]
 
 _allowed = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1')
 ALLOWED_HOSTS = [h.strip() for h in _allowed.split(',')]
@@ -78,7 +72,7 @@ ALLOWED_HOSTS = [h.strip() for h in _allowed.split(',')]
 ALLOWED_HOSTS += ['.railway.app', '.up.railway.app', '.vercel.app']
 
 # Allow Railway / Vercel preview URLs automatically
-CORS_ALLOW_ALL_ORIGINS = os.environ.get('CORS_ALLOW_ALL_ORIGINS', 'False').strip() == 'True'
+CORS_ALLOW_ALL_ORIGINS = os.environ.get('CORS_ALLOW_ALL_ORIGINS', 'False') == 'True'
 
 ROOT_URLCONF = 'page_and_prose.urls'
 
