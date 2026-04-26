@@ -1,4 +1,4 @@
-const BASE_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8000/api';
+const BASE_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? 'https://page-prose-production.up.railway.app/api';
 const MEDIA_BASE = BASE_URL.replace(/\/api$/, '');
 
 /** Returns the full URL for a book cover image path returned by the API. */
