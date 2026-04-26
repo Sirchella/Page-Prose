@@ -165,8 +165,10 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Falls back to local disk storage when the var is absent (local dev).
 CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL', '')
 if CLOUDINARY_URL:
-    INSTALLED_APPS = ['cloudinary_storage'] + list(INSTALLED_APPS) + ['cloudinary']
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    import cloudinary
+    cloudinary.config()  # auto-reads CLOUDINARY_URL env var
+    INSTALLED_APPS = list(INSTALLED_APPS) + ['cloudinary']
+    DEFAULT_FILE_STORAGE = 'page_and_prose.cloudinary_storage.CloudinaryMediaStorage'
 
 # Campay Mobile Money — replace placeholders in .env with your real credentials
 # Use https://demo.campay.net/api/ for testing, https://www.campay.net/api/ for production
