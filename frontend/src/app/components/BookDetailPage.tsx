@@ -1,22 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router';
 import { fetchBook, fetchBooks, coverUrl, type Book as ApiBook } from '../api';
-import { Star, Heart, ShoppingCart, ChevronLeft, ChevronRight, User, Check } from 'lucide-react';
+import { Heart, ShoppingCart, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import { useCart } from '../CartContext';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-
-interface Review {
-  id: string;
-  author: string;
-  rating: number;
-  date: string;
-  title: string;
-  comment: string;
-  verified: boolean;
-}
 
 interface RelatedBook {
   id: string;
@@ -24,45 +14,7 @@ interface RelatedBook {
   author: string;
   price: number;
   coverImage: string;
-  rating: number;
 }
-
-const bookImages = [
-  'https://images.unsplash.com/photo-1763768861268-cb6b54173dbf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjbGFzc2ljJTIwYm9vayUyMGNvdmVyJTIwdmludGFnZXxlbnwxfHx8fDE3NzMzODI3NjF8MA&ixlib=rb-4.1.0&q=80&w=1080',
-  'https://images.unsplash.com/photo-1758565811465-4c64744b898a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxib29rJTIwaW50ZXJpb3IlMjBwYWdlcyUyMGRldGFpbHxlbnwxfHx8fDE3NzMzOTkzNDF8MA&ixlib=rb-4.1.0&q=80&w=1080',
-  'https://images.unsplash.com/photo-1692742593479-7b37552a4815?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxib29rJTIwc3BpbmUlMjBjbG9zZSUyMHVwfGVufDF8fHx8MTc3MzM5OTM0MXww&ixlib=rb-4.1.0&q=80&w=1080',
-  'https://images.unsplash.com/photo-1692877157706-b370f2a048a1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxib29rJTIwYmFjayUyMGNvdmVyfGVufDF8fHx8MTc3MzM5OTM0Mnww&ixlib=rb-4.1.0&q=80&w=1080',
-];
-
-const reviews: Review[] = [
-  {
-    id: '1',
-    author: 'Sarah Mitchell',
-    rating: 5,
-    date: 'March 5, 2026',
-    title: 'A masterpiece of modern fiction',
-    comment: 'This book completely captivated me from the first page. The writing is beautiful, the characters are deeply developed, and the story stays with you long after you finish reading. Highly recommended!',
-    verified: true,
-  },
-  {
-    id: '2',
-    author: 'James Wilson',
-    rating: 4,
-    date: 'February 28, 2026',
-    title: 'Engaging and thought-provoking',
-    comment: 'A wonderful exploration of life\'s complexities. While the pacing slowed in the middle, the ending was absolutely worth it. The author\'s prose is exceptional.',
-    verified: true,
-  },
-  {
-    id: '3',
-    author: 'Emily Chen',
-    rating: 5,
-    date: 'February 15, 2026',
-    title: 'Could not put it down!',
-    comment: 'Finished this in two days because I couldn\'t stop reading. The concept is brilliant and executed perfectly. This is the kind of book that reminds you why you love reading.',
-    verified: false,
-  },
-];
 
 
 function apiBookToDisplay(b: ApiBook) {
@@ -75,15 +27,11 @@ function apiBookToDisplay(b: ApiBook) {
     paperbackPrice: parseFloat(b.price),
     genre: b.genre,
     format: ['Paperback'] as string[],
-    coverImage: coverUrl(b.cover_image) || bookImages[0],
+    coverImage: coverUrl(b.cover_image) || '',
     inStock: b.stock > 0,
-    rating: 4.5,
-    reviewCount: 0,
     synopsis: b.description,
     isbn: b.isbn,
-    publisher: '',
     publicationDate: b.created_at.slice(0, 10),
-    pages: 0,
   };
 }
 
@@ -107,8 +55,7 @@ export function BookDetailPage() {
         setRelatedBooks(all.filter(b => String(b.id) !== id).slice(0, 5).map(b => ({
           id: String(b.id), title: b.title, author: b.author,
           price: parseFloat(b.price),
-          coverImage: coverUrl(b.cover_image) || bookImages[0],
-          rating: 4.5,
+          coverImage: coverUrl(b.cover_image) || '',
         })));
       })
       .catch(() => {});
@@ -181,36 +128,21 @@ export function BookDetailPage() {
       <div className="max-w-[1440px] mx-auto px-4 md:px-8 py-6 md:py-12">
         {/* Product Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 mb-8 md:mb-16">
-          {/* Left Side - Images */}
+          {/* Left Side - Image */}
           <div>
             {/* Main Image */}
             <div className="bg-white border-2 border-[#D4C4B0] rounded-lg overflow-hidden mb-4 aspect-[3/4]">
-              <ImageWithFallback
-                src={selectedImage === 0 ? book.coverImage : bookImages[selectedImage]}
-                alt={book.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            {/* Thumbnail Previews */}
-            <div className="grid grid-cols-4 gap-3">
-              {bookImages.map((image, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSelectedImage(index)}
-                  className={`aspect-[3/4] rounded-lg overflow-hidden border-2 transition-all ${
-                    selectedImage === index
-                      ? 'border-[#4A7C2C] shadow-lg'
-                      : 'border-[#D4C4B0] hover:border-[#A68A64]'
-                  }`}
-                >
-                  <ImageWithFallback
-                    src={image}
-                    alt={`Preview ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </button>
-              ))}
+              {book.coverImage ? (
+                <ImageWithFallback
+                  src={book.coverImage}
+                  alt={book.title}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-[#F5EFE7]">
+                  <span className="text-[#6B5D4F] text-center px-4 font-serif text-lg">{book.title}</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -225,19 +157,8 @@ export function BookDetailPage() {
                 by <span className="hover:underline">{book.author}</span>
               </p>
 
-              {/* Rating */}
-              <div className="flex items-center gap-3">
-                <div className="flex gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`w-5 h-5 ${
-                        i < 4 ? 'fill-[#F59E0B] text-[#F59E0B]' : 'text-[#D4C4B0]'
-                      }`}
-                    />
-                  ))}
-                </div>
-                <span className="text-sm text-[#6B5D4F]">{book.rating} ({book.reviewCount.toLocaleString()} reviews)</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#4A7C2C]/10 rounded-full">
+                <span className="text-sm text-[#4A7C2C] font-semibold">{book.genre}</span>
               </div>
             </div>
 
@@ -358,17 +279,15 @@ export function BookDetailPage() {
                   <span className="ml-2 text-[#2C2416] font-semibold">{book.genre}</span>
                 </div>
                 <div>
-                  <span className="text-[#6B5D4F]">Pages:</span>
-                  <span className="ml-2 text-[#2C2416] font-semibold">{book.pages}</span>
+                  <span className="text-[#6B5D4F]">Added:</span>
+                  <span className="ml-2 text-[#2C2416] font-semibold">{book.publicationDate}</span>
                 </div>
-                <div>
-                  <span className="text-[#6B5D4F]">Publisher:</span>
-                  <span className="ml-2 text-[#2C2416] font-semibold">{book.publisher}</span>
-                </div>
-                <div>
-                  <span className="text-[#6B5D4F]">ISBN:</span>
-                  <span className="ml-2 text-[#2C2416] font-semibold">{book.isbn}</span>
-                </div>
+                {book.isbn && (
+                  <div className="col-span-2">
+                    <span className="text-[#6B5D4F]">ISBN:</span>
+                    <span className="ml-2 text-[#2C2416] font-semibold">{book.isbn}</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -388,130 +307,31 @@ export function BookDetailPage() {
           <div className="bg-white border-2 border-[#D4C4B0] rounded-lg p-4 md:p-8 mb-4 md:mb-8">
             <h2 className="text-xl md:text-2xl text-[#2C2416] font-serif mb-4 md:mb-6">Book Details</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-              <div className="space-y-4">
+              <div>
+                <div className="text-sm text-[#6B5D4F] mb-1">Author</div>
+                <div className="text-base text-[#2C2416]">{book.author}</div>
+              </div>
+              <div>
+                <div className="text-sm text-[#6B5D4F] mb-1">Genre</div>
+                <div className="text-base text-[#2C2416] capitalize">{book.genre}</div>
+              </div>
+              <div>
+                <div className="text-sm text-[#6B5D4F] mb-1">Date Added</div>
+                <div className="text-base text-[#2C2416]">{book.publicationDate}</div>
+              </div>
+              {book.isbn && (
                 <div>
-                  <div className="text-sm text-[#6B5D4F] mb-1">ISBN-13</div>
+                  <div className="text-sm text-[#6B5D4F] mb-1">ISBN</div>
                   <div className="text-base text-[#2C2416]">{book.isbn}</div>
                 </div>
-                <div>
-                  <div className="text-sm text-[#6B5D4F] mb-1">Publisher</div>
-                  <div className="text-base text-[#2C2416]">{book.publisher}</div>
-                </div>
-                <div>
-                  <div className="text-sm text-[#6B5D4F] mb-1">Publication Date</div>
-                  <div className="text-base text-[#2C2416]">{book.publicationDate}</div>
-                </div>
-                <div>
-                  <div className="text-sm text-[#6B5D4F] mb-1">Language</div>
-                  <div className="text-base text-[#2C2416]">English</div>
-                </div>
-              </div>
-              <div className="space-y-4">
-                <div>
-                  <div className="text-sm text-[#6B5D4F] mb-1">Pages</div>
-                  <div className="text-base text-[#2C2416]">{book.pages} pages</div>
-                </div>
-                <div>
-                  <div className="text-sm text-[#6B5D4F] mb-1">Dimensions</div>
-                  <div className="text-base text-[#2C2416]">21.6 x 13.5 x 2.8 cm</div>
-                </div>
-                <div>
-                  <div className="text-sm text-[#6B5D4F] mb-1">Weight</div>
-                  <div className="text-base text-[#2C2416]">420g</div>
-                </div>
-                <div>
-                  <div className="text-sm text-[#6B5D4F] mb-1">Awards</div>
-                  <div className="text-base text-[#2C2416]">Goodreads Choice Award Nominee (2020)</div>
-                </div>
-              </div>
+              )}
             </div>
           </div>
 
-          {/* Customer Reviews */}
+          {/* Customer Reviews placeholder */}
           <div className="bg-white border-2 border-[#D4C4B0] rounded-lg p-4 md:p-8">
-            <div className="flex items-center justify-between mb-4 md:mb-6">
-              <h2 className="text-xl md:text-2xl text-[#2C2416] font-serif">Customer Reviews</h2>
-              <button onClick={() => alert('Review submission coming soon.')} className="px-4 py-2 border-2 border-[#4A7C2C] text-[#4A7C2C] rounded-lg hover:bg-[#4A7C2C] hover:text-white transition-colors">
-                Write a Review
-              </button>
-            </div>
-
-            {/* Review Summary */}
-            <div className="flex flex-col sm:flex-row items-start gap-4 md:gap-8 pb-6 md:pb-8 mb-6 md:mb-8 border-b-2 border-[#E8DCC8]">
-              <div className="text-center">
-                <div className="text-5xl text-[#4A7C2C] font-serif mb-2">{book.rating}</div>
-                <div className="flex gap-1 mb-2">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`w-5 h-5 ${
-                        i < 4 ? 'fill-[#F59E0B] text-[#F59E0B]' : 'text-[#D4C4B0]'
-                      }`}
-                    />
-                  ))}
-                </div>
-                <div className="text-sm text-[#6B5D4F]">{book.reviewCount.toLocaleString()} reviews</div>
-              </div>
-
-              <div className="flex-1 space-y-2">
-                {[5, 4, 3, 2, 1].map((stars) => (
-                  <div key={stars} className="flex items-center gap-3">
-                    <span className="text-sm text-[#6B5D4F] w-12">{stars} star</span>
-                    <div className="flex-1 h-2 bg-[#E8DCC8] rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-[#F59E0B] rounded-full"
-                        style={{ width: `${stars === 5 ? 65 : stars === 4 ? 25 : stars === 3 ? 7 : stars === 2 ? 2 : 1}%` }}
-                      />
-                    </div>
-                    <span className="text-sm text-[#6B5D4F] w-12 text-right">
-                      {stars === 5 ? '1,850' : stars === 4 ? '712' : stars === 3 ? '199' : stars === 2 ? '57' : '29'}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Individual Reviews */}
-            <div className="space-y-6">
-              {reviews.map((review) => (
-                <div key={review.id} className="pb-6 border-b border-[#E8DCC8] last:border-0">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-full bg-[#4A7C2C] flex items-center justify-center flex-shrink-0">
-                      <User className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="font-semibold text-[#2C2416]">{review.author}</span>
-                        {review.verified && (
-                          <span className="px-2 py-1 bg-[#4A7C2C]/10 text-[#4A7C2C] text-xs rounded">
-                            Verified Purchase
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="flex gap-1">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`w-4 h-4 ${
-                                i < review.rating ? 'fill-[#F59E0B] text-[#F59E0B]' : 'text-[#D4C4B0]'
-                              }`}
-                            />
-                          ))}
-                        </div>
-                        <span className="text-sm text-[#6B5D4F]">{review.date}</span>
-                      </div>
-                      <h4 className="font-semibold text-[#2C2416] mb-2">{review.title}</h4>
-                      <p className="text-[#4A4A4A] leading-relaxed">{review.comment}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <button onClick={() => alert('Loading more reviews...')} className="w-full mt-6 py-3 border-2 border-[#D4C4B0] text-[#4A7C2C] rounded-lg hover:bg-[#F5EFE7] transition-colors">
-              Show More Reviews
-            </button>
+            <h2 className="text-xl md:text-2xl text-[#2C2416] font-serif mb-4">Customer Reviews</h2>
+            <p className="text-[#6B5D4F] text-sm">Reviews are coming soon. Be the first to read and share your thoughts!</p>
           </div>
         </div>
 
@@ -535,19 +355,6 @@ export function BookDetailPage() {
                         {book.title}
                       </h3>
                       <p className="text-xs text-[#6B5D4F] mb-2">{book.author}</p>
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="flex gap-1">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`w-3 h-3 ${
-                                i < Math.floor(book.rating) ? 'fill-[#F59E0B] text-[#F59E0B]' : 'text-[#D4C4B0]'
-                              }`}
-                            />
-                          ))}
-                        </div>
-                        <span className="text-xs text-[#6B5D4F]">{book.rating}</span>
-                      </div>
                       <div className="text-lg font-serif text-[#4A7C2C]">
                         {Math.round(book.price).toLocaleString()} XAF
                       </div>

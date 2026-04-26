@@ -33,6 +33,7 @@ function apiBooksToDisplay(apiBooks: ApiBook[]): Book[] {
 
 export function ProductsTable() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [bookList, setBookList] = useState<Book[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('all');
@@ -88,7 +89,7 @@ export function ProductsTable() {
           <p className="text-sm text-[#a3a3a3] mt-1">Manage your book inventory</p>
         </div>
         <button
-          onClick={() => setIsDrawerOpen(true)}
+          onClick={() => { setSelectedBook(null); setIsDrawerOpen(true); }}
           className="flex items-center gap-2 px-6 py-3 bg-[#A68A64] text-[#0a0a0a] rounded-lg hover:bg-[#C4A67A] transition-colors"
         >
           <Plus className="w-5 h-5" />
@@ -213,7 +214,7 @@ export function ProductsTable() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
-                      <button onClick={() => setIsDrawerOpen(true)} className="p-2 text-[#a3a3a3] hover:text-[#A68A64] hover:bg-[#262626] rounded transition-colors">
+                      <button onClick={() => { setSelectedBook(book); setIsDrawerOpen(true); }} className="p-2 text-[#a3a3a3] hover:text-[#A68A64] hover:bg-[#262626] rounded transition-colors">
                         <Edit className="w-4 h-4" />
                       </button>
                       <button onClick={() => handleDelete(book.id, book.title)} className="p-2 text-[#a3a3a3] hover:text-[#dc2626] hover:bg-[#262626] rounded transition-colors">
@@ -229,7 +230,7 @@ export function ProductsTable() {
       </div>
 
       {/* Drawer */}
-      <ProductDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
+      <ProductDrawer isOpen={isDrawerOpen} onClose={() => { setSelectedBook(null); setIsDrawerOpen(false); }} editBook={selectedBook} />
     </div>
   );
 }

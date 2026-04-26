@@ -195,7 +195,7 @@ export function PaymentsOverview() {
               </div>
             </div>
 
-            <Button variant="outline" onClick={() => alert('Exporting report...')} className="gap-2 border-[#262626] text-[#f5f5f5] hover:bg-[#262626]">
+            <Button variant="outline" onClick={() => window.print()} className="gap-2 border-[#262626] text-[#f5f5f5] hover:bg-[#262626]">
               <Download className="w-4 h-4" />
               Export Report
             </Button>

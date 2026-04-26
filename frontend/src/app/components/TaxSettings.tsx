@@ -1,4 +1,4 @@
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Check } from 'lucide-react';
 import { useState } from 'react';
 
 interface TaxRule {
@@ -9,14 +9,15 @@ interface TaxRule {
 }
 
 export function TaxSettings() {
-  const [taxRules, setTaxRules] = useState<TaxRule[]>([
-    { id: '1', region: 'United States', state: 'California', rate: '7.25' },
-    { id: '2', region: 'United States', state: 'New York', rate: '8.00' },
-    { id: '3', region: 'United States', state: 'Texas', rate: '6.25' },
-    { id: '4', region: 'Canada', state: 'Ontario', rate: '13.00' },
-  ]);
+  const [taxRules, setTaxRules] = useState<TaxRule[]>([]);
 
   const [collectTax, setCollectTax] = useState(true);
+  const [savedMsg, setSavedMsg] = useState('');
+
+  const handleSave = () => {
+    setSavedMsg('Settings saved.');
+    setTimeout(() => setSavedMsg(''), 3000);
+  };
 
   const addTaxRule = () => {
     setTaxRules([...taxRules, { id: Date.now().toString(), region: '', state: '', rate: '' }]);
@@ -139,8 +140,13 @@ export function TaxSettings() {
       )}
 
       {/* Save Button */}
-      <div className="flex justify-end pt-4">
-        <button onClick={() => alert('Tax settings saved!')} className="px-6 py-3 bg-[#A68A64] text-[#0a0a0a] rounded-lg hover:bg-[#C4A67A] transition-colors">
+      <div className="flex items-center justify-end gap-4 pt-4">
+        {savedMsg && (
+          <span className="flex items-center gap-1 text-sm text-green-400">
+            <Check className="w-4 h-4" /> {savedMsg}
+          </span>
+        )}
+        <button onClick={handleSave} className="px-6 py-3 bg-[#A68A64] text-[#0a0a0a] rounded-lg hover:bg-[#C4A67A] transition-colors">
           Save Tax Settings
         </button>
       </div>

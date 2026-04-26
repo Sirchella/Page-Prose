@@ -1,1 +1,1 @@
-web: python manage.py migrate --no-input && python manage.py createsuperuser --no-input || true && gunicorn page_and_prose.wsgi --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+web: mkdir -p media/covers && python manage.py migrate --no-input && python manage.py createsuperuser --no-input || true && gunicorn page_and_prose.wsgi --bind 0.0.0.0:$PORT --workers 2 --timeout 120

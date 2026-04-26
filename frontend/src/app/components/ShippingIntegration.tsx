@@ -295,7 +295,7 @@ export function ShippingIntegration() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-[#f5f5f5]">Shipping Rules</h2>
-            <Button onClick={() => alert('Add rule — coming soon.')} className="gap-2 bg-[#A68A64] hover:bg-[#8B7355]">
+            <Button disabled className="gap-2 bg-[#A68A64] hover:bg-[#8B7355] opacity-60 cursor-not-allowed">
               <Plus className="w-4 h-4" />
               Add Rule
             </Button>
@@ -334,7 +334,7 @@ export function ShippingIntegration() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Button onClick={() => alert('Edit rule — coming soon.')} variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-[#262626]">
+                        <Button disabled variant="ghost" size="sm" className="h-8 w-8 p-0 opacity-40 cursor-not-allowed">
                           <Edit3 className="w-3.5 h-3.5 text-[#a3a3a3]" />
                         </Button>
                         <Button onClick={() => { if (confirm('Delete this rule?')) setRules(prev => prev.filter(r => r.id !== rule.id)); }} variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-[#262626]">

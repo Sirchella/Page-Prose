@@ -192,7 +192,7 @@ export function ProductDatabaseViewer() {
                       <Button variant="outline" onClick={() => setImportDialogOpen(false)} className="border-[#262626] text-[#f5f5f5] hover:bg-[#262626]">
                         Cancel
                       </Button>
-                      <Button onClick={() => { alert('Importing...'); setImportDialogOpen(false); }} className="bg-[#A68A64] hover:bg-[#8B7355]">
+                      <Button onClick={() => { setImportDialogOpen(false); }} className="bg-[#A68A64] hover:bg-[#8B7355]">
                         Upload & Import
                       </Button>
                     </div>

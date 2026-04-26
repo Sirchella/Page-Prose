@@ -17,6 +17,13 @@ export function PromotionSettings() {
 
   const [showNewPromoForm, setShowNewPromoForm] = useState(false);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [promoFormError, setPromoFormError] = useState('');
+  const [savedMsg, setSavedMsg] = useState('');
+
+  const handleSave = () => {
+    setSavedMsg('Settings saved.');
+    setTimeout(() => setSavedMsg(''), 3000);
+  };
   const [newPromo, setNewPromo] = useState<Omit<Promotion, 'id' | 'active'>>({
     code: '',
     type: 'percentage',
@@ -37,9 +44,10 @@ export function PromotionSettings() {
 
   const addPromotion = () => {
     if (!newPromo.code || !newPromo.value || !newPromo.maxUses || !newPromo.expiryDate) {
-      alert('Please fill in all required fields');
+      setPromoFormError('Please fill in all required fields');
       return;
     }
+    setPromoFormError('');
 
     setPromotions([
       ...promotions,
@@ -202,6 +210,9 @@ export function PromotionSettings() {
                 Create Code
               </button>
             </div>
+            {promoFormError && (
+              <p className="text-sm text-red-400 mt-2">{promoFormError}</p>
+            )}
           </div>
         </div>
       )}
@@ -292,8 +303,13 @@ export function PromotionSettings() {
       </div>
 
       {/* Save Button */}
-      <div className="flex justify-end pt-4">
-        <button onClick={() => alert('Promotion settings saved!')} className="px-6 py-3 bg-[#A68A64] text-[#0a0a0a] rounded-lg hover:bg-[#C4A67A] transition-colors">
+      <div className="flex items-center justify-end gap-4 pt-4">
+        {savedMsg && (
+          <span className="flex items-center gap-1 text-sm text-green-400">
+            <Check className="w-4 h-4" /> {savedMsg}
+          </span>
+        )}
+        <button onClick={handleSave} className="px-6 py-3 bg-[#A68A64] text-[#0a0a0a] rounded-lg hover:bg-[#C4A67A] transition-colors">
           Save Promotion Settings
         </button>
       </div>

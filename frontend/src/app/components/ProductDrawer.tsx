@@ -1,13 +1,24 @@
 import { X, Upload } from 'lucide-react';
-import { useState, useRef } from 'react';
-import { createBook } from '../api';
+import { useState, useRef, useEffect } from 'react';
+import { createBook, updateBook } from '../api';
+
+interface Book {
+  id: string;
+  title: string;
+  author: string;
+  isbn: string;
+  price: number;
+  stock: number;
+  genre: string;
+}
 
 interface ProductDrawerProps {
   isOpen: boolean;
   onClose: () => void;
+  editBook?: Book | null;
 }
 
-export function ProductDrawer({ isOpen, onClose }: ProductDrawerProps) {
+export function ProductDrawer({ isOpen, onClose, editBook }: ProductDrawerProps) {
   const [formData, setFormData] = useState({
     title: '',
     author: '',
@@ -22,6 +33,26 @@ export function ProductDrawer({ isOpen, onClose }: ProductDrawerProps) {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editBook) {
+      setFormData({
+        title: editBook.title,
+        author: editBook.author,
+        genre: editBook.genre,
+        price: String(editBook.price),
+        stock: String(editBook.stock),
+        isbn: editBook.isbn ?? '',
+        description: '',
+      });
+      setCoverFile(null);
+      setCoverPreview(null);
+      setSaveError('');
+    } else {
+      resetForm();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editBook]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
@@ -54,7 +85,11 @@ export function ProductDrawer({ isOpen, onClose }: ProductDrawerProps) {
       fd.append('description', formData.description);
       if (formData.isbn) fd.append('isbn', formData.isbn);
       if (coverFile) fd.append('cover_image', coverFile);
-      await createBook(fd);
+      if (editBook) {
+        await updateBook(parseInt(editBook.id), fd);
+      } else {
+        await createBook(fd);
+      }
       resetForm();
       onClose();
     } catch (err: unknown) {
@@ -86,7 +121,7 @@ export function ProductDrawer({ isOpen, onClose }: ProductDrawerProps) {
         {/* Header */}
         <div className="sticky top-0 bg-[#1a1a1a] border-b border-[#262626] p-6 flex items-center justify-between">
           <div>
-            <h2 className="text-2xl text-[#f5f5f5]">Add New Book</h2>
+            <h2 className="text-2xl text-[#f5f5f5]">{editBook ? 'Edit Book' : 'Add New Book'}</h2>
             <p className="text-sm text-[#a3a3a3] mt-1">Enter the book details below</p>
           </div>
           <button
@@ -250,7 +285,7 @@ export function ProductDrawer({ isOpen, onClose }: ProductDrawerProps) {
               disabled={saving}
               className="flex-1 px-6 py-3 bg-[#A68A64] text-[#0a0a0a] rounded-lg hover:bg-[#C4A67A] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {saving ? 'Saving…' : 'Add Book'}
+              {saving ? 'Saving…' : editBook ? 'Save Changes' : 'Add Book'}
             </button>
           </div>
         </form>

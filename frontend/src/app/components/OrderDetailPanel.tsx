@@ -19,7 +19,7 @@ interface Order {
   items: OrderItem[];
   total: number;
   date: string;
-  status: 'new' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'packing' | 'shipped' | 'delivered' | 'cancelled';
   shippingAddress: {
     street: string;
     city: string;
@@ -42,9 +42,10 @@ export function OrderDetailPanel({ order, onClose, onMarkAsShipped, onCancelOrde
 
   const getStatusColor = (status: Order['status']) => {
     switch (status) {
-      case 'new':
+      case 'pending':
         return 'bg-[#A68A64]/20 text-[#C4A67A] border-[#A68A64]/30';
-      case 'processing':
+      case 'confirmed':
+      case 'packing':
         return 'bg-[#3b82f6]/20 text-[#60a5fa] border-[#3b82f6]/30';
       case 'shipped':
         return 'bg-[#8b5cf6]/20 text-[#a78bfa] border-[#8b5cf6]/30';
@@ -62,8 +63,6 @@ export function OrderDetailPanel({ order, onClose, onMarkAsShipped, onCancelOrde
   };
 
   const subtotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const shipping = 5.99;
-  const tax = subtotal * 0.0725;
 
   return (
     <>
@@ -174,16 +173,8 @@ export function OrderDetailPanel({ order, onClose, onMarkAsShipped, onCancelOrde
                 <span className="text-[#a3a3a3]">Subtotal</span>
                 <span className="text-green-400">{Math.round(subtotal).toLocaleString()} XAF</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-[#a3a3a3]">Shipping</span>
-                <span className="text-green-400">{Math.round(shipping).toLocaleString()} XAF</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-[#a3a3a3]">Tax</span>
-                <span className="text-green-400">{Math.round(tax).toLocaleString()} XAF</span>
-              </div>
               <div className="pt-3 border-t border-[#262626] flex justify-between">
-                <span className="text-[#f5f5f5]">Total</span>
+                <span className="text-[#f5f5f5]">Order Total</span>
                 <span className="text-lg text-green-400">{Math.round(order.total).toLocaleString()} XAF</span>
               </div>
             </div>
@@ -204,7 +195,7 @@ export function OrderDetailPanel({ order, onClose, onMarkAsShipped, onCancelOrde
           {/* Action Buttons */}
           {order.status !== 'cancelled' && order.status !== 'delivered' && (
             <div className="sticky bottom-0 bg-[#1a1a1a] pt-4 border-t border-[#262626] space-y-3">
-              {order.status === 'new' || order.status === 'processing' ? (
+              {order.status === 'pending' || order.status === 'confirmed' || order.status === 'packing' ? (
                 <button
                   onClick={() => onMarkAsShipped(order.id)}
                   className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-[#4A7C2C] text-white rounded-lg hover:bg-[#6B9D48] transition-colors"

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useLocation } from 'react-router';
 import { ArrowLeft, Truck, MapPin, Lock, Check, Smartphone, Loader2 } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { createOrder, initiatePayment, checkPaymentStatus } from '../api';
@@ -20,7 +20,9 @@ type PaymentStatus = 'idle' | 'waiting' | 'failed';
 
 export function CheckoutPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { items: cartItems, clearCart } = useCart();
+  const locationDiscount = (location.state as { discount?: { code: string; amount: number } | null } | null)?.discount ?? null;
   const [currentStep, setCurrentStep] = useState(1);
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>('standard');
   const pollingRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -56,7 +58,8 @@ export function CheckoutPage() {
 
   const subtotal = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const deliveryPrice = deliveryOptions.find(d => d.id === deliveryMethod)?.price || 0;
-  const total = subtotal + deliveryPrice;
+  const discountAmount = locationDiscount?.amount ?? 0;
+  const total = subtotal + deliveryPrice - discountAmount;
 
   // Clean up polling on unmount
   useEffect(() => () => { if (pollingRef.current) clearTimeout(pollingRef.current); }, []);
@@ -453,6 +456,12 @@ export function CheckoutPage() {
                   <span>Delivery</span>
                   <span>{currentStep >= 2 ? `${deliveryPrice.toLocaleString()} XAF` : 'TBD'}</span>
                 </div>
+                {locationDiscount && (
+                  <div className="flex justify-between text-[#4A7C2C]">
+                    <span>Discount ({locationDiscount.code})</span>
+                    <span>-{Math.round(discountAmount).toLocaleString()} XAF</span>
+                  </div>
+                )}
               </div>
 
               <div className="mb-6">

@@ -11,6 +11,7 @@ export function AdminLoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resetMsg, setResetMsg] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,11 +145,14 @@ export function AdminLoginPage() {
             <div className="text-center">
               <button
                 type="button"
-                onClick={() => alert('Password reset — coming soon.')}
+                onClick={() => setResetMsg('Password reset is coming soon. Please contact your administrator.')}
                 className="text-sm text-[#A68A64] hover:text-[#8f7556] transition-colors hover:underline"
               >
                 Forgot Password?
               </button>
+              {resetMsg && (
+                <p className="mt-2 text-xs text-[#6B5D4F]">{resetMsg}</p>
+              )}
             </div>
           </form>
 
