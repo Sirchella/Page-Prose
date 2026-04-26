@@ -14,6 +14,7 @@ import {
   Database,
   GitBranch,
   X,
+  Store,
 } from 'lucide-react';
 
 const navItems = [
