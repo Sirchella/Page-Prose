@@ -1,60 +1,53 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useEffect, useState } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { fetchOrders } from '../api';
 
-const data = [
-  { month: 'Jan', revenue: 12400 },
-  { month: 'Feb', revenue: 15800 },
-  { month: 'Mar', revenue: 14200 },
-  { month: 'Apr', revenue: 18900 },
-  { month: 'May', revenue: 21300 },
-  { month: 'Jun', revenue: 19800 },
-  { month: 'Jul', revenue: 23500 },
-  { month: 'Aug', revenue: 25100 },
-  { month: 'Sep', revenue: 22700 },
-  { month: 'Oct', revenue: 27400 },
-  { month: 'Nov', revenue: 29800 },
-  { month: 'Dec', revenue: 31200 },
-];
+interface MonthData {
+  month: string;
+  revenue: number;
+}
 
 export function RevenueChart() {
-  return (
-    <div className="bg-[#1a1a1a] border border-[#262626] rounded-lg p-6">
-      <div className="mb-6">
-        <h3 className="text-lg text-[#f5f5f5] mb-1">Monthly Revenue</h3>
-        <p className="text-sm text-[#a3a3a3]">Revenue trends over the past 12 months</p>
+  const [data, setData] = useState<MonthData[]>([]);
+
+  useEffect(() => {
+    fetchOrders()
+      .then(orders => {
+        const map: Record<string, number> = {};
+        orders.forEach(o => {
+          const d = new Date(o.created_at);
+          const key = d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+          map[key] = (map[key] ?? 0) + parseFloat(o.total_price);
+        });
+        const sorted = Object.entries(map)
+          .map(([month, revenue]) => ({ month, revenue: Math.round(revenue) }))
+          .sort((a, b) => new Date('1 ' + a.month).getTime() - new Date('1 ' + b.month).getTime());
+        setData(sorted);
+      })
+      .catch(() => {});
+  }, []);
+
+  if (data.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-48 text-[#a3a3a3] text-sm">
+        No revenue data yet. Revenue will appear once orders are placed.
       </div>
-      
-      <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#262626" />
-          <XAxis 
-            dataKey="month" 
-            stroke="#a3a3a3"
-            tick={{ fill: '#a3a3a3' }}
-          />
-          <YAxis 
-            stroke="#a3a3a3"
-            tick={{ fill: '#a3a3a3' }}
-            tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-          />
-          <Tooltip 
-            contentStyle={{ 
-              backgroundColor: '#1a1a1a', 
-              border: '1px solid #262626',
-              borderRadius: '8px',
-              color: '#f5f5f5'
-            }}
-            formatter={(value: number) => [`${Math.round(value).toLocaleString()} XAF`, 'Revenue']}
-          />
-          <Line 
-            type="monotone" 
-            dataKey="revenue" 
-            stroke="#A68A64" 
-            strokeWidth={2}
-            dot={{ fill: '#A68A64', r: 4 }}
-            activeDot={{ r: 6, fill: '#C4A67A' }}
-          />
-        </LineChart>
-      </ResponsiveContainer>
-    </div>
+    );
+  }
+
+  return (
+    <ResponsiveContainer width="100%" height={200}>
+      <BarChart data={data} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="#262626" />
+        <XAxis dataKey="month" tick={{ fill: '#a3a3a3', fontSize: 11 }} axisLine={false} tickLine={false} />
+        <YAxis tick={{ fill: '#a3a3a3', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
+        <Tooltip
+          contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #262626', borderRadius: '8px' }}
+          labelStyle={{ color: '#f5f5f5' }}
+          formatter={(value: number) => [`${value.toLocaleString()} XAF`, 'Revenue']}
+        />
+        <Bar dataKey="revenue" fill="#A68A64" radius={[4, 4, 0, 0]} />
+      </BarChart>
+    </ResponsiveContainer>
   );
 }

@@ -7,8 +7,8 @@ export function PaymentSettings() {
   const [showStripeSecret, setShowStripeSecret] = useState(false);
   const [showPaypalSecret, setShowPaypalSecret] = useState(false);
 
-  const [stripePublicKey, setStripePublicKey] = useState('pk_test_51234567890abcdefghijk');
-  const [stripeSecretKey, setStripeSecretKey] = useState('sk_test_51234567890abcdefghijk');
+  const [stripePublicKey, setStripePublicKey] = useState('');
+  const [stripeSecretKey, setStripeSecretKey] = useState('');
   const [paypalClientId, setPaypalClientId] = useState('');
   const [paypalSecret, setPaypalSecret] = useState('');
 

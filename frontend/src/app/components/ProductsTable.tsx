@@ -16,118 +16,6 @@ interface Book {
   status: 'active' | 'out-of-stock';
 }
 
-const books: Book[] = [
-  {
-    id: '1',
-    coverUrl: 'https://images.unsplash.com/photo-1763768861268-cb6b54173dbf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx2aW50YWdlJTIwYm9vayUyMGNvdmVyJTIwY2xhc3NpY3xlbnwxfHx8fDE3NzMzNDkwNTR8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    title: 'The Midnight Library',
-    author: 'Matt Haig',
-    isbn: '978-0-525-55948-1',
-    price: 24.99,
-    stock: 156,
-    genre: 'Fiction',
-    status: 'active',
-  },
-  {
-    id: '2',
-    coverUrl: 'https://images.unsplash.com/photo-1758803184789-a5dd872fe82e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxub3ZlbCUyMGJvb2slMjBjb3ZlciUyMG1vZGVybnxlbnwxfHx8fDE3NzMzMjU5MjZ8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    title: 'Where the Crawdads Sing',
-    author: 'Delia Owens',
-    isbn: '978-0-735-21909-1',
-    price: 18.50,
-    stock: 243,
-    genre: 'Fiction',
-    status: 'active',
-  },
-  {
-    id: '3',
-    coverUrl: 'https://images.unsplash.com/photo-1670523798656-eda0ea506db6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmaWN0aW9uJTIwYm9vayUyMGNvdmVyJTIwY29sb3JmdWx8ZW58MXx8fHwxNzczMzQ5MDU1fDA&ixlib=rb-4.1.0&q=80&w=1080',
-    title: 'Project Hail Mary',
-    author: 'Andy Weir',
-    isbn: '978-0-593-13520-5',
-    price: 29.99,
-    stock: 87,
-    genre: 'Science Fiction',
-    status: 'active',
-  },
-  {
-    id: '4',
-    coverUrl: 'https://images.unsplash.com/photo-1760696473709-a7da66ee87a6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxteXN0ZXJ5JTIwdGhyaWxsZXIlMjBib29rJTIwY292ZXJ8ZW58MXx8fHwxNzczMjMzMjMyfDA&ixlib=rb-4.1.0&q=80&w=1080',
-    title: 'The Silent Patient',
-    author: 'Alex Michaelides',
-    isbn: '978-1-250-30170-7',
-    price: 22.00,
-    stock: 0,
-    genre: 'Mystery',
-    status: 'out-of-stock',
-  },
-  {
-    id: '5',
-    coverUrl: 'https://images.unsplash.com/photo-1770983438142-c12f4422e5e0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyb21hbmNlJTIwYm9vayUyMGNvdmVyJTIwZWxlZ2FudHxlbnwxfHx8fDE3NzMzNDkwNTV8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    title: 'The Seven Husbands of Evelyn Hugo',
-    author: 'Taylor Jenkins Reid',
-    isbn: '978-1-501-16180-5',
-    price: 19.99,
-    stock: 198,
-    genre: 'Romance',
-    status: 'active',
-  },
-  {
-    id: '6',
-    coverUrl: 'https://images.unsplash.com/photo-1685478237148-aaf613b2e8ad?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYW50YXN5JTIwYm9vayUyMGNvdmVyJTIwbWFnaWNhbHxlbnwxfHx8fDE3NzMyODMyNjZ8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    title: 'The Name of the Wind',
-    author: 'Patrick Rothfuss',
-    isbn: '978-0-756-40474-1',
-    price: 27.50,
-    stock: 134,
-    genre: 'Fantasy',
-    status: 'active',
-  },
-  {
-    id: '7',
-    coverUrl: 'https://images.unsplash.com/photo-1772225027406-00bda64076b6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzY2llbmNlJTIwZmljdGlvbiUyMGJvb2slMjBjb3ZlcnxlbnwxfHx8fDE3NzMyODk4Nzd8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    title: 'Dune',
-    author: 'Frank Herbert',
-    isbn: '978-0-441-17271-9',
-    price: 25.00,
-    stock: 276,
-    genre: 'Science Fiction',
-    status: 'active',
-  },
-  {
-    id: '8',
-    coverUrl: 'https://images.unsplash.com/photo-1769963121626-7f1885db412c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiaW9ncmFwaHklMjBib29rJTIwY292ZXJ8ZW58MXx8fHwxNzczMzMxODY3fDA&ixlib=rb-4.1.0&q=80&w=1080',
-    title: 'Educated',
-    author: 'Tara Westover',
-    isbn: '978-0-399-59050-4',
-    price: 19.99,
-    stock: 0,
-    genre: 'Biography',
-    status: 'out-of-stock',
-  },
-  {
-    id: '9',
-    coverUrl: 'https://images.unsplash.com/photo-1763768861268-cb6b54173dbf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx2aW50YWdlJTIwYm9vayUyMGNvdmVyJTIwY2xhc3NpY3xlbnwxfHx8fDE3NzMzNDkwNTR8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    title: 'Atomic Habits',
-    author: 'James Clear',
-    isbn: '978-0-735-21129-3',
-    price: 16.99,
-    stock: 412,
-    genre: 'Self-Help',
-    status: 'active',
-  },
-  {
-    id: '10',
-    coverUrl: 'https://images.unsplash.com/photo-1758803184789-a5dd872fe82e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxub3ZlbCUyMGJvb2slMjBjb3ZlciUyMG1vZGVybnxlbnwxfHx8fDE3NzMzMjU5MjZ8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    title: 'The Psychology of Money',
-    author: 'Morgan Housel',
-    isbn: '978-0-857-19769-8',
-    price: 21.50,
-    stock: 189,
-    genre: 'Business',
-    status: 'active',
-  },
-];
 
 function apiBooksToDisplay(apiBooks: ApiBook[]): Book[] {
   return apiBooks.map(b => ({
@@ -145,7 +33,7 @@ function apiBooksToDisplay(apiBooks: ApiBook[]): Book[] {
 
 export function ProductsTable() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [bookList, setBookList] = useState<Book[]>(books);
+  const [bookList, setBookList] = useState<Book[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');

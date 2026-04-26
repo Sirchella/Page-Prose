@@ -32,35 +32,6 @@ interface DragItem {
   currentStatus: OrderStatus;
 }
 
-const generateOrders = (): Order[] => {
-  const customers = [
-    'Sarah Johnson', 'Michael Chen', 'Emma Wilson', 'David Martinez',
-    'Lisa Anderson', 'James Brown', 'Rachel Green', 'Thomas Wright',
-    'Amy Foster', 'Kevin Taylor', 'Jennifer Lee', 'Robert Davis',
-    'Maria Garcia', 'Christopher Moore', 'Laura Taylor', 'Daniel White',
-  ];
-
-  const statuses: OrderStatus[] = ['received', 'confirmed', 'packing', 'shipped', 'delivered'];
-  const orders: Order[] = [];
-
-  for (let i = 0; i < 32; i++) {
-    const daysAgo = Math.floor(Math.random() * 5);
-    const orderDate = new Date('2026-03-15');
-    orderDate.setDate(orderDate.getDate() - daysAgo);
-
-    orders.push({
-      id: `ORD${String(3000 + i).padStart(5, '0')}`,
-      customerName: customers[Math.floor(Math.random() * customers.length)],
-      bookCount: Math.floor(Math.random() * 8) + 1,
-      totalValue: parseFloat((Math.random() * 200 + 25).toFixed(2)),
-      status: statuses[Math.floor(Math.random() * statuses.length)],
-      date: orderDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      priority: Math.random() > 0.8 ? 'high' : 'normal',
-    });
-  }
-
-  return orders;
-};
 
 interface OrderCardProps {
   order: Order;
@@ -216,7 +187,7 @@ function OrderPipelineContent() {
     }
 
     if (dateFilter !== 'all') {
-      const today = new Date('2026-03-15');
+      const today = new Date();
       filtered = filtered.filter((order) => {
         if (dateFilter === 'today') {
           return order.date === today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });

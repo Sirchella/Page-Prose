@@ -100,7 +100,7 @@ export function PaymentsOverview() {
   }, []);
 
   const todayTransactions = transactions.filter((tx) => {
-    const today = new Date('2026-03-15').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     return tx.date === today;
   });
 

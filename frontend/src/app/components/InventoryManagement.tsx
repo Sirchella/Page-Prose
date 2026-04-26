@@ -40,33 +40,11 @@ interface InventoryItem {
   restockThreshold: number;
 }
 
-const generateInventoryData = (): InventoryItem[] => {
-  return [
-    { id: 'BK1001', title: 'The Silent Echo', author: 'Emma Richardson', currentStock: 45, reservedUnits: 8, restockThreshold: 20 },
-    { id: 'BK1002', title: 'Whispers in Time', author: 'James Mitchell', currentStock: 12, reservedUnits: 5, restockThreshold: 15 },
-    { id: 'BK1003', title: 'Beyond the Horizon', author: 'Sarah Chen', currentStock: 78, reservedUnits: 12, restockThreshold: 25 },
-    { id: 'BK1004', title: 'The Last Garden', author: 'David Walsh', currentStock: 8, reservedUnits: 3, restockThreshold: 20 },
-    { id: 'BK1005', title: 'Midnight Chronicles', author: 'Maria Garcia', currentStock: 156, reservedUnits: 22, restockThreshold: 30 },
-    { id: 'BK1006', title: 'The Forgotten Path', author: 'Robert Foster', currentStock: 34, reservedUnits: 7, restockThreshold: 25 },
-    { id: 'BK1007', title: 'Echoes of Tomorrow', author: 'Lisa Anderson', currentStock: 18, reservedUnits: 9, restockThreshold: 20 },
-    { id: 'BK1008', title: 'The Silver Thread', author: 'Michael Brown', currentStock: 5, reservedUnits: 2, restockThreshold: 15 },
-    { id: 'BK1009', title: 'Dancing with Shadows', author: 'Jennifer Lee', currentStock: 92, reservedUnits: 14, restockThreshold: 20 },
-    { id: 'BK1010', title: 'The Crimson Key', author: 'Thomas Wright', currentStock: 23, reservedUnits: 6, restockThreshold: 25 },
-    { id: 'BK1011', title: 'Tales of the North', author: 'Amy Carter', currentStock: 67, reservedUnits: 11, restockThreshold: 20 },
-    { id: 'BK1012', title: 'The Ancient Code', author: 'Daniel Moore', currentStock: 14, reservedUnits: 4, restockThreshold: 18 },
-    { id: 'BK1013', title: 'Beneath the Stars', author: 'Rachel Green', currentStock: 103, reservedUnits: 18, restockThreshold: 30 },
-    { id: 'BK1014', title: 'The Hidden Door', author: 'Christopher Davis', currentStock: 7, reservedUnits: 3, restockThreshold: 20 },
-    { id: 'BK1015', title: 'Waves of Memory', author: 'Laura Martinez', currentStock: 41, reservedUnits: 9, restockThreshold: 25 },
-    { id: 'BK1016', title: 'The Eternal Flame', author: 'Kevin Taylor', currentStock: 19, reservedUnits: 5, restockThreshold: 22 },
-    { id: 'BK1017', title: 'Secrets of the Sea', author: 'Emma Richardson', currentStock: 88, reservedUnits: 16, restockThreshold: 20 },
-    { id: 'BK1018', title: 'The Golden Hour', author: 'James Mitchell', currentStock: 11, reservedUnits: 4, restockThreshold: 20 },
-  ];
-};
 
 type StockStatus = 'critical' | 'low' | 'good';
 
 export function InventoryManagement() {
-  const [inventory, setInventory] = useState<InventoryItem[]>(generateInventoryData());
+  const [inventory, setInventory] = useState<InventoryItem[]>([]);
 
   useEffect(() => {
     fetchBooks()

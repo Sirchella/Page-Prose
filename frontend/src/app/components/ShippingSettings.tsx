@@ -15,18 +15,9 @@ interface Carrier {
 }
 
 export function ShippingSettings() {
-  const [zones, setZones] = useState<ShippingZone[]>([
-    { id: '1', name: 'Domestic', regions: 'United States', rate: '5.99' },
-    { id: '2', name: 'Canada', regions: 'Canada', rate: '12.99' },
-    { id: '3', name: 'International', regions: 'Rest of World', rate: '19.99' },
-  ]);
+  const [zones, setZones] = useState<ShippingZone[]>([]);
 
-  const [carriers, setCarriers] = useState<Carrier[]>([
-    { id: '1', name: 'USPS', enabled: true },
-    { id: '2', name: 'FedEx', enabled: true },
-    { id: '3', name: 'UPS', enabled: false },
-    { id: '4', name: 'DHL', enabled: false },
-  ]);
+  const [carriers, setCarriers] = useState<Carrier[]>([]);
 
   const addZone = () => {
     setZones([...zones, { id: Date.now().toString(), name: '', regions: '', rate: '' }]);

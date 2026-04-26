@@ -13,28 +13,7 @@ interface Promotion {
 }
 
 export function PromotionSettings() {
-  const [promotions, setPromotions] = useState<Promotion[]>([
-    {
-      id: '1',
-      code: 'WELCOME20',
-      type: 'percentage',
-      value: '20',
-      minPurchase: '50',
-      maxUses: '100',
-      expiryDate: '2026-06-30',
-      active: true,
-    },
-    {
-      id: '2',
-      code: 'FREESHIP',
-      type: 'fixed',
-      value: '10',
-      minPurchase: '0',
-      maxUses: '500',
-      expiryDate: '2026-12-31',
-      active: true,
-    },
-  ]);
+  const [promotions, setPromotions] = useState<Promotion[]>([]);
 
   const [showNewPromoForm, setShowNewPromoForm] = useState(false);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);

@@ -71,75 +71,13 @@ interface TrackingInfo {
   events: TrackingEvent[];
 }
 
-const initialCarriers: Carrier[] = [
-  {
-    id: 'ups',
-    name: 'UPS',
-    logo: '📦',
-    status: 'connected',
-    apiKey: 'ups_live_1234567890abcdef',
-    lastTested: '2 hours ago',
-  },
-  {
-    id: 'royal-mail',
-    name: 'Royal Mail',
-    logo: '✉️',
-    status: 'connected',
-    apiKey: 'rm_live_abcdef1234567890',
-    lastTested: '1 day ago',
-  },
-  {
-    id: 'fedex',
-    name: 'FedEx',
-    logo: '🚚',
-    status: 'disconnected',
-    apiKey: '',
-    lastTested: null,
-  },
-];
-
-const initialRules: ShippingRule[] = [
-  {
-    id: '1',
-    minWeight: 0,
-    maxWeight: 0.5,
-    carrier: 'Royal Mail',
-    serviceType: 'First Class',
-    estimatedDays: '1-2',
-  },
-  {
-    id: '2',
-    minWeight: 0.5,
-    maxWeight: 2,
-    carrier: 'Royal Mail',
-    serviceType: 'Second Class',
-    estimatedDays: '2-3',
-  },
-  {
-    id: '3',
-    minWeight: 2,
-    maxWeight: 5,
-    carrier: 'UPS',
-    serviceType: 'Ground',
-    estimatedDays: '3-5',
-  },
-  {
-    id: '4',
-    minWeight: 5,
-    maxWeight: 20,
-    carrier: 'UPS',
-    serviceType: 'Standard',
-    estimatedDays: '4-6',
-  },
-];
 
 export function ShippingIntegration() {
-  const [carriers, setCarriers] = useState<Carrier[]>(initialCarriers);
-  const [rules, setRules] = useState<ShippingRule[]>(initialRules);
+  const [carriers, setCarriers] = useState<Carrier[]>([]);
+  const [rules, setRules] = useState<ShippingRule[]>([]);
   const [showApiKey, setShowApiKey] = useState<Record<string, boolean>>({});
   const [trackingNumber, setTrackingNumber] = useState('');
   const [trackingInfo, setTrackingInfo] = useState<TrackingInfo | null>(null);
-  const [isTracking, setIsTracking] = useState(false);
 
   const handleTestConnection = (carrierId: string) => {
     setCarriers((prev) =>
@@ -182,44 +120,14 @@ export function ShippingIntegration() {
   const handleTrackPackage = () => {
     if (!trackingNumber.trim()) return;
 
-    setIsTracking(true);
-
-    setTimeout(() => {
-      setTrackingInfo({
-        trackingNumber: trackingNumber,
-        carrier: 'UPS',
-        status: 'in-transit',
-        estimatedDelivery: 'March 17, 2026',
-        currentLocation: 'Birmingham Distribution Center, UK',
-        events: [
-          {
-            timestamp: 'Mar 15, 2026 2:45 PM',
-            location: 'Birmingham Distribution Center, UK',
-            status: 'In Transit',
-            description: 'Package is in transit to the next facility',
-          },
-          {
-            timestamp: 'Mar 15, 2026 8:30 AM',
-            location: 'London Sorting Facility, UK',
-            status: 'Departed',
-            description: 'Package has departed from sorting facility',
-          },
-          {
-            timestamp: 'Mar 14, 2026 6:15 PM',
-            location: 'London Sorting Facility, UK',
-            status: 'Arrived',
-            description: 'Package arrived at sorting facility',
-          },
-          {
-            timestamp: 'Mar 14, 2026 2:00 PM',
-            location: 'Page & Prose Warehouse, London',
-            status: 'Picked Up',
-            description: 'Package picked up by carrier',
-          },
-        ],
-      });
-      setIsTracking(false);
-    }, 1000);
+    setTrackingInfo({
+      trackingNumber: trackingNumber,
+      carrier: trackingNumber.startsWith('1Z') ? 'UPS' : 'Royal Mail',
+      estimatedDelivery: 'Contact carrier for delivery estimate',
+      currentLocation: 'Live tracking not yet integrated',
+      status: 'pending',
+      events: [],
+    });
   };
 
   const getStatusBadge = (status: ConnectionStatus) => {
@@ -465,11 +373,11 @@ export function ShippingIntegration() {
                   <div className="flex items-end">
                     <Button
                       onClick={handleTrackPackage}
-                      disabled={!trackingNumber.trim() || isTracking}
+                      disabled={!trackingNumber.trim()}
                       className="gap-2 bg-[#A68A64] hover:bg-[#8B7355]"
                     >
                       <Search className="w-4 h-4" />
-                      {isTracking ? 'Tracking...' : 'Track'}
+                      Track
                     </Button>
                   </div>
                 </div>

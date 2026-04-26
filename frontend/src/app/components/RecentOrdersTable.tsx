@@ -1,116 +1,66 @@
-interface Order {
-  id: string;
-  customer: string;
-  product: string;
-  amount: string;
-  status: 'completed' | 'processing' | 'pending';
-  date: string;
-}
+import { useEffect, useState } from 'react';
+import { fetchOrders, type Order } from '../api';
 
-const orders: Order[] = [
-  {
-    id: '#ORD-2891',
-    customer: 'Emma Richardson',
-    product: 'The Midnight Library',
-    amount: '14,999 XAF',
-    status: 'completed',
-    date: 'Mar 12, 2026',
-  },
-  {
-    id: '#ORD-2890',
-    customer: 'James Chen',
-    product: 'Where the Crawdads Sing',
-    amount: '10,999 XAF',
-    status: 'processing',
-    date: 'Mar 12, 2026',
-  },
-  {
-    id: '#ORD-2889',
-    customer: 'Sarah Williams',
-    product: 'Project Hail Mary',
-    amount: '17,999 XAF',
-    status: 'completed',
-    date: 'Mar 11, 2026',
-  },
-  {
-    id: '#ORD-2888',
-    customer: 'Michael Brown',
-    product: 'Atomic Habits',
-    amount: '9,999 XAF',
-    status: 'pending',
-    date: 'Mar 11, 2026',
-  },
-  {
-    id: '#ORD-2887',
-    customer: 'Lisa Anderson',
-    product: 'The Silent Patient',
-    amount: '12,999 XAF',
-    status: 'completed',
-    date: 'Mar 10, 2026',
-  },
-  {
-    id: '#ORD-2886',
-    customer: 'David Martinez',
-    product: 'Educated',
-    amount: '11,999 XAF',
-    status: 'processing',
-    date: 'Mar 10, 2026',
-  },
-];
+const statusStyles: Record<string, string> = {
+  pending:   'bg-amber-950 text-amber-400 border border-amber-700',
+  confirmed: 'bg-blue-950 text-blue-400 border border-blue-700',
+  packing:   'bg-purple-950 text-purple-400 border border-purple-700',
+  shipped:   'bg-indigo-950 text-indigo-400 border border-indigo-700',
+  delivered: 'bg-green-950 text-green-400 border border-green-700',
+  cancelled: 'bg-red-950 text-red-400 border border-red-700',
+};
 
 export function RecentOrdersTable() {
-  const getStatusColor = (status: Order['status']) => {
-    switch (status) {
-      case 'completed':
-        return 'bg-[#4A7C2C]/20 text-[#6B9D48] border-[#4A7C2C]/30';
-      case 'processing':
-        return 'bg-[#A68A64]/20 text-[#C4A67A] border-[#A68A64]/30';
-      case 'pending':
-        return 'bg-[#525252]/20 text-[#a3a3a3] border-[#525252]/30';
-    }
-  };
+  const [orders, setOrders] = useState<Order[]>([]);
 
-  const getStatusLabel = (status: Order['status']) => {
-    return status.charAt(0).toUpperCase() + status.slice(1);
-  };
+  useEffect(() => {
+    fetchOrders()
+      .then(all => setOrders(all.slice(0, 6)))
+      .catch(() => {});
+  }, []);
+
+  if (orders.length === 0) {
+    return (
+      <div className="text-center py-12 text-[#a3a3a3] text-sm">
+        No orders yet. Orders will appear here once customers start purchasing.
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-[#1a1a1a] border border-[#262626] rounded-lg">
-      <div className="p-6 border-b border-[#262626]">
-        <h3 className="text-lg text-[#f5f5f5] mb-1">Recent Orders</h3>
-        <p className="text-sm text-[#a3a3a3]">Latest customer orders and their status</p>
-      </div>
-      
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-[#262626]">
-              <th className="text-left px-6 py-4 text-sm text-[#a3a3a3]">Order ID</th>
-              <th className="text-left px-6 py-4 text-sm text-[#a3a3a3]">Customer</th>
-              <th className="text-left px-6 py-4 text-sm text-[#a3a3a3]">Product</th>
-              <th className="text-left px-6 py-4 text-sm text-[#a3a3a3]">Amount</th>
-              <th className="text-left px-6 py-4 text-sm text-[#a3a3a3]">Status</th>
-              <th className="text-left px-6 py-4 text-sm text-[#a3a3a3]">Date</th>
+    <div className="overflow-x-auto">
+      <table className="w-full">
+        <thead>
+          <tr className="border-b border-[#262626]">
+            <th className="text-left py-3 text-xs text-[#a3a3a3] font-medium">Order</th>
+            <th className="text-left py-3 text-xs text-[#a3a3a3] font-medium">Customer</th>
+            <th className="text-left py-3 text-xs text-[#a3a3a3] font-medium">Date</th>
+            <th className="text-right py-3 text-xs text-[#a3a3a3] font-medium">Amount</th>
+            <th className="text-right py-3 text-xs text-[#a3a3a3] font-medium">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {orders.map(order => (
+            <tr key={order.id} className="border-b border-[#262626] hover:bg-[#1a1a1a] transition-colors">
+              <td className="py-3 text-sm text-[#f5f5f5] font-mono">
+                #ORD-{String(order.id).padStart(7, '0')}
+              </td>
+              <td className="py-3 text-sm text-[#f5f5f5]">{order.customer_name}</td>
+              <td className="py-3 text-sm text-[#a3a3a3]">
+                {new Date(order.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              </td>
+              <td className="py-3 text-sm text-right text-[#f5f5f5]">
+                {Math.round(parseFloat(order.total_price)).toLocaleString()} XAF
+              </td>
+              <td className="py-3 text-right">
+                <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${statusStyles[order.status] ?? 'bg-[#262626] text-[#a3a3a3]'}`}>
+                  {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                </span>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order.id} className="border-b border-[#262626] hover:bg-[#1a1a1a]/50 transition-colors">
-                <td className="px-6 py-4 text-sm text-[#f5f5f5]">{order.id}</td>
-                <td className="px-6 py-4 text-sm text-[#f5f5f5]">{order.customer}</td>
-                <td className="px-6 py-4 text-sm text-[#a3a3a3]">{order.product}</td>
-                <td className="px-6 py-4 text-sm text-[#f5f5f5]">{order.amount}</td>
-                <td className="px-6 py-4">
-                  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs border ${getStatusColor(order.status)}`}>
-                    {getStatusLabel(order.status)}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm text-[#a3a3a3]">{order.date}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
