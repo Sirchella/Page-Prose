@@ -136,7 +136,7 @@ export function PromotionSettings() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm text-[#f5f5f5] mb-2">
-                  {newPromo.type === 'percentage' ? 'Percentage (%)' : 'Amount ($)'} *
+                  {newPromo.type === 'percentage' ? 'Percentage (%)' : 'Amount (XAF)'} *
                 </label>
                 <input
                   type="number"
@@ -240,13 +240,13 @@ export function PromotionSettings() {
                   <div>
                     <p className="text-[#a3a3a3] mb-1">Discount</p>
                     <p className="text-[#f5f5f5]">
-                      {promo.type === 'percentage' ? `${promo.value}%` : `$${promo.value}`} off
+                      {promo.type === 'percentage' ? `${promo.value}%` : `${promo.value} XAF`} off
                     </p>
                   </div>
                   <div>
                     <p className="text-[#a3a3a3] mb-1">Min Purchase</p>
                     <p className="text-[#f5f5f5]">
-                      {promo.minPurchase === '0' ? 'None' : `$${promo.minPurchase}`}
+                      {promo.minPurchase === '0' ? 'None' : `${promo.minPurchase} XAF`}
                     </p>
                   </div>
                   <div>

@@ -51,8 +51,8 @@ export function ProductDrawer({ isOpen, onClose }: ProductDrawerProps) {
       fd.append('genre', formData.genre);
       fd.append('price', formData.price);
       fd.append('stock', formData.stock);
-      fd.append('isbn', formData.isbn);
       fd.append('description', formData.description);
+      if (formData.isbn) fd.append('isbn', formData.isbn);
       if (coverFile) fd.append('cover_image', coverFile);
       await createBook(fd);
       resetForm();
@@ -193,15 +193,15 @@ export function ProductDrawer({ isOpen, onClose }: ProductDrawerProps) {
             <div>
               <label className="block text-sm text-[#f5f5f5] mb-2">Price *</label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#a3a3a3]">$</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#a3a3a3] text-xs">XAF</span>
                 <input
                   type="number"
                   name="price"
                   value={formData.price}
                   onChange={handleChange}
-                  className="w-full bg-[#0a0a0a] border border-[#262626] rounded-lg pl-8 pr-4 py-3 text-[#f5f5f5] focus:outline-none focus:ring-2 focus:ring-[#A68A64] focus:border-transparent"
-                  placeholder="0.00"
-                  step="0.01"
+                  className="w-full bg-[#0a0a0a] border border-[#262626] rounded-lg pl-12 pr-4 py-3 text-[#f5f5f5] focus:outline-none focus:ring-2 focus:ring-[#A68A64] focus:border-transparent"
+                  placeholder="0"
+                  step="1"
                   min="0"
                   required
                 />
