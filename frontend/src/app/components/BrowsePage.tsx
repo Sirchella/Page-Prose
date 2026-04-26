@@ -43,11 +43,12 @@ export function BrowsePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [books, setBooks] = useState<DisplayBook[]>([]);
+  const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
     fetchBooks()
       .then(apiBooks => setBooks(apiBooks.map(mapApiBook)))
-      .catch(() => {});
+      .catch(() => setFetchError(true));
   }, []);
 
   const handleAddToCart = (book: DisplayBook) => {
@@ -385,8 +386,15 @@ export function BrowsePage() {
               ))}
             </div>
 
+            {/* Fetch Error */}
+            {fetchError && (
+              <div className="text-center py-20">
+                <p className="text-xl text-[#6B5D4F] font-serif mb-2">Failed to load books. Please try again.</p>
+              </div>
+            )}
+
             {/* No Results */}
-            {filteredBooks.length === 0 && (
+            {!fetchError && filteredBooks.length === 0 && (
               <div className="text-center py-20">
                 <p className="text-xl text-[#6B5D4F] font-serif mb-2">No books found</p>
                 <p className="text-sm text-[#8B6F47]">Try adjusting your filters or search query</p>

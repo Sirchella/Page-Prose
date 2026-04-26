@@ -123,11 +123,9 @@ export function CheckoutPage() {
               customer_email: shippingData.email,
               shipping_address: shippingAddress,
               total_price: total.toFixed(2),
-              items: orderItems.map(item => ({
-                book: parseInt(item.id),
-                quantity: item.quantity,
-                price: item.price.toFixed(2),
-              })),
+              items: orderItems
+                .map(item => ({ book: Number(item.id), quantity: item.quantity, price: item.price.toFixed(2) }))
+                .filter(item => !isNaN(item.book)),
             });
             clearCart();
             navigate('/order-confirmation', {
