@@ -1,0 +1,1 @@
+web: python manage.py migrate --no-input && gunicorn page_and_prose.wsgi --bind 0.0.0.0:$PORT --workers 2 --timeout 120
