@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { ShoppingCart, User, Trash2, Plus, Minus, Tag, ArrowRight, ArrowLeft } from 'lucide-react';
+import { ShoppingCart, User, Trash2, Plus, Minus, Tag, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { useCart } from '../CartContext';
+import { validateDiscount } from '../api';
 
 export function CartPage() {
   const navigate = useNavigate();
@@ -11,17 +12,20 @@ export function CartPage() {
   const [discountCode, setDiscountCode] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; amount: number } | null>(null);
   const [discountError, setDiscountError] = useState('');
+  const [validatingDiscount, setValidatingDiscount] = useState(false);
 
-  const applyDiscount = () => {
+  const applyDiscount = async () => {
     const code = discountCode.trim().toUpperCase();
-    if (code === 'WELCOME10') {
-      setAppliedDiscount({ code, amount: subtotal * 0.1 });
-      setDiscountError('');
-    } else if (code === 'BOOK20') {
-      setAppliedDiscount({ code, amount: subtotal * 0.2 });
-      setDiscountError('');
-    } else {
-      setDiscountError('Invalid discount code');
+    if (!code) return;
+    setDiscountError('');
+    setValidatingDiscount(true);
+    try {
+      const result = await validateDiscount(code, subtotal);
+      setAppliedDiscount({ code: result.code, amount: parseFloat(result.amount) });
+    } catch (err) {
+      setDiscountError(err instanceof Error ? err.message : 'Invalid discount code');
+    } finally {
+      setValidatingDiscount(false);
     }
   };
 
@@ -222,14 +226,16 @@ export function CartPage() {
                         type="text"
                         value={discountCode}
                         onChange={(e) => { setDiscountCode(e.target.value); setDiscountError(''); }}
+                        onKeyDown={(e) => { if (e.key === 'Enter') applyDiscount(); }}
                         placeholder="Enter code"
                         className="flex-1 px-3 py-2 border-2 border-[#D4C4B0] rounded-lg focus:outline-none focus:border-[#4A7C2C] text-[#2C2416]"
                       />
                       <button
                         onClick={applyDiscount}
-                        className="px-4 py-2 bg-[#A68A64] text-white rounded-lg hover:bg-[#8f7556] transition-colors"
+                        disabled={validatingDiscount}
+                        className="px-4 py-2 bg-[#A68A64] text-white rounded-lg hover:bg-[#8f7556] transition-colors disabled:opacity-60 flex items-center gap-1"
                       >
-                        Apply
+                        {validatingDiscount ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Apply'}
                       </button>
                     </div>
                   )}
@@ -237,7 +243,7 @@ export function CartPage() {
                     <p className="text-xs text-red-500 mt-1">{discountError}</p>
                   )}
                   <p className="text-xs text-[#6B5D4F] mt-2">
-                    Try: WELCOME10 or BOOK20
+                    Enter a valid discount code to save on your order.
                   </p>
                 </div>
 

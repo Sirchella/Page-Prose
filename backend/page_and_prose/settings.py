@@ -160,6 +160,14 @@ SIMPLE_JWT = {
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Cloudinary — persistent image storage so uploads survive Railway redeploys.
+# Set CLOUDINARY_URL=cloudinary://API_KEY:API_SECRET@CLOUD_NAME in Railway env vars.
+# Falls back to local disk storage when the var is absent (local dev).
+CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL', '')
+if CLOUDINARY_URL:
+    INSTALLED_APPS = ['cloudinary_storage'] + list(INSTALLED_APPS) + ['cloudinary']
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 # Campay Mobile Money — replace placeholders in .env with your real credentials
 # Use https://demo.campay.net/api/ for testing, https://www.campay.net/api/ for production
 CAMPAY_BASE_URL = os.environ.get('CAMPAY_BASE_URL', 'https://demo.campay.net/api/')

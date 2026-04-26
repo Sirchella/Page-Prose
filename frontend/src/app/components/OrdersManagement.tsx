@@ -55,9 +55,9 @@ function mapApiOrder(o: ApiOrder): Order {
     customerPhone: '',
     items: o.items.map(item => ({
       id: String(item.id),
-      title: `Book #${item.book}`,
-      author: '',
-      coverUrl: '',
+      title: item.book_title || `Book #${item.book}`,
+      author: item.book_author || '',
+      coverUrl: item.book_cover || '',
       quantity: item.quantity,
       price: parseFloat(item.price),
     })),

@@ -108,6 +108,9 @@ export async function deleteBook(id: number): Promise<void> {
 export interface OrderItem {
   id: number;
   book: number;
+  book_title: string;
+  book_author: string;
+  book_cover: string;
   quantity: number;
   price: string;
 }
@@ -202,4 +205,88 @@ export async function checkPaymentStatus(reference: string): Promise<{ status: s
     throw new Error(data.error || 'Failed to check payment status');
   }
   return res.json();
+}
+
+// ─── Discount Codes ──────────────────────────────────────────────────────────
+
+export interface DiscountCode {
+  id: number;
+  code: string;
+  type: 'percentage' | 'fixed';
+  value: string;
+  min_purchase: string;
+  max_uses: number | null;
+  uses: number;
+  expiry_date: string | null;
+  active: boolean;
+  created_at: string;
+}
+
+export async function fetchDiscounts(): Promise<DiscountCode[]> {
+  const headers = await authHeaders();
+  const res = await fetch(`${BASE_URL}/discounts/`, { headers });
+  if (!res.ok) throw new Error('Failed to fetch discounts');
+  const data = await res.json();
+  return Array.isArray(data) ? data : data.results ?? [];
+}
+
+export async function createDiscount(data: {
+  code: string;
+  type: 'percentage' | 'fixed';
+  value: string;
+  min_purchase?: string;
+  max_uses?: number | null;
+  expiry_date?: string | null;
+}): Promise<DiscountCode> {
+  const headers = await authHeaders();
+  const res = await fetch(`${BASE_URL}/discounts/`, {
+    method: 'POST',
+    headers: { ...headers, 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const detail = await res.json().catch(() => ({}));
+    const msg = typeof detail === 'object'
+      ? Object.entries(detail).map(([k, v]) => `${k}: ${v}`).join(', ')
+      : 'Failed to create discount';
+    throw new Error(msg);
+  }
+  return res.json();
+}
+
+export async function updateDiscount(id: number, data: Partial<Pick<DiscountCode, 'active' | 'value' | 'max_uses' | 'expiry_date'>>): Promise<DiscountCode> {
+  const headers = await authHeaders();
+  const res = await fetch(`${BASE_URL}/discounts/${id}/`, {
+    method: 'PATCH',
+    headers: { ...headers, 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('Failed to update discount');
+  return res.json();
+}
+
+export async function deleteDiscount(id: number): Promise<void> {
+  const headers = await authHeaders();
+  const res = await fetch(`${BASE_URL}/discounts/${id}/`, {
+    method: 'DELETE',
+    headers,
+  });
+  if (!res.ok) throw new Error('Failed to delete discount');
+}
+
+/** Validates a discount code against a cart subtotal. Throws with user-facing error message on failure. */
+export async function validateDiscount(code: string, subtotal: number): Promise<{
+  code: string;
+  type: string;
+  value: string;
+  amount: string;
+}> {
+  const res = await fetch(`${BASE_URL}/discounts/validate/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code, subtotal }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Invalid discount code');
+  return data;
 }

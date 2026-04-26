@@ -5,8 +5,8 @@ from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Order
-from .serializers import OrderSerializer, OrderCreateSerializer
+from .models import Order, DiscountCode
+from .serializers import OrderSerializer, OrderCreateSerializer, DiscountCodeSerializer
 from .emails import send_test_email
 
 
@@ -114,3 +114,54 @@ class SendTestEmailView(APIView):
             )
         send_test_email(to)
         return Response({'ok': True})
+
+
+class DiscountCodeViewSet(viewsets.ModelViewSet):
+    """CRUD for discount codes — admin only."""
+    queryset = DiscountCode.objects.all().order_by('-created_at')
+    serializer_class = DiscountCodeSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class ValidateDiscountView(APIView):
+    """POST /api/discounts/validate/ — public; validates a code against a subtotal."""
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        from decimal import Decimal, InvalidOperation
+        from datetime import date
+
+        code = request.data.get('code', '').strip().upper()
+        try:
+            subtotal = Decimal(str(request.data.get('subtotal', 0)))
+        except InvalidOperation:
+            return Response({'error': 'Invalid subtotal'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            discount = DiscountCode.objects.get(code=code, active=True)
+        except DiscountCode.DoesNotExist:
+            return Response({'error': 'Invalid discount code'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if discount.expiry_date and discount.expiry_date < date.today():
+            return Response({'error': 'This code has expired'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if discount.max_uses is not None and discount.uses >= discount.max_uses:
+            return Response({'error': 'This code has reached its maximum uses'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if subtotal < discount.min_purchase:
+            return Response(
+                {'error': f'Minimum purchase of {int(discount.min_purchase):,} XAF required'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if discount.type == 'percentage':
+            amount = subtotal * (discount.value / Decimal('100'))
+        else:
+            amount = min(discount.value, subtotal)
+
+        return Response({
+            'code': discount.code,
+            'type': discount.type,
+            'value': str(discount.value),
+            'amount': str(amount.quantize(Decimal('0.01'))),
+        })

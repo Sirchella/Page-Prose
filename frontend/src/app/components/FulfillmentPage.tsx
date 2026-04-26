@@ -36,7 +36,7 @@ export function FulfillmentPage() {
             orderNumber: `#ORD-${o.id}`,
             customerName: o.customer_name,
             email: o.customer_email,
-            items: o.items.map(i => ({ title: `Book #${i.book}`, quantity: i.quantity })),
+            items: o.items.map(i => ({ title: i.book_title || `Book #${i.book}`, quantity: i.quantity })),
             destination: o.shipping_address,
             country: 'Unknown',
             totalItems: o.items.reduce((s, i) => s + i.quantity, 0),
