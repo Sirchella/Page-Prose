@@ -73,7 +73,13 @@ export async function createBook(data: FormData): Promise<Book> {
     headers,
     body: data,
   });
-  if (!res.ok) throw new Error('Failed to create book');
+  if (!res.ok) {
+    const detail = await res.json().catch(() => ({}));
+    const msg = typeof detail === 'object'
+      ? Object.entries(detail).map(([k, v]) => `${k}: ${v}`).join(', ')
+      : 'Failed to create book';
+    throw new Error(msg || `Error ${res.status}`);
+  }
   return res.json();
 }
 
